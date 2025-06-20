@@ -238,12 +238,31 @@
 
   // Reproduce canal en una pantalla específica
   function reproducirCanal(url, playerIndex) {
-    const player = document.getElementById(`player${playerIndex + 1}`);
-    if (player) {
-      player.src = url;
-      player.play();
-    }
+  const player = document.getElementById(`player${playerIndex + 1}`);
+
+  // Limpia instancia anterior
+  if (player.hlsInstance) {
+    player.hlsInstance.destroy();
   }
+
+  if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(url);
+    hls.attachMedia(player);
+    player.hlsInstance = hls;
+    hls.on(Hls.Events.MANIFEST_PARSED, function () {
+      player.play();
+    });
+  } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+    // Para Safari o navegadores compatibles nativamente
+    player.src = url;
+    player.addEventListener('loadedmetadata', function () {
+      player.play();
+    });
+  } else {
+    alert("Tu navegador no soporta la reproducción de este canal.");
+  }
+}
 
   // Carga automática del archivo M3U
   fetch("update .m3u")
@@ -294,16 +313,13 @@
     canalSeleccionado = null;
   }
 
-  function reproducirEnPantallaSeleccionada(pantallaIndex) {
-    if (canalSeleccionado) {
-      const player = document.getElementById(`player${pantallaIndex + 1}`);
-      if (player) {
-        player.src = canalSeleccionado;
-        player.play();
-      }
-    }
-    cerrarModalPantalla();
+  // Esta función usa la de arriba
+function reproducirEnPantallaSeleccionada(pantallaIndex) {
+  if (canalSeleccionado) {
+    reproducirCanal(canalSeleccionado, pantallaIndex);
   }
+  cerrarModalPantalla();
+}
 
   fetch("update .m3u")
     .then(res => res.text())
