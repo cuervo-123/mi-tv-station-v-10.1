@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi TV Station (YouTube Integrado)</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header, main, footer {
+      padding: 1rem;
+    }
+    #buscador {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 5px;
+    }
+    #canales-inferiores {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: #222;
+    }
+    .canal {
+      background: #333;
+      border-radius: 10px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .canal:hover {
+      background: #555;
+    }
+    .player-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .player-container {
+      position: relative;
+      width: 100%;
+      height: 30vh;
+      background: #000;
+    }
+    video, .player-container iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .botones-panel {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    button {
+      padding: 0.3rem 0.6rem;
+      background: #444;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #666;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #222;
+      padding: 1rem;
+      border-radius: 10px;
+      width: 80%;
+      max-height: 80%;
+      overflow: auto;
+    }
+    #listaFavoritos {
+      list-style: none;
+      padding: 0;
+    }
+    #listaFavoritos li {
+      padding: 0.5rem;
+      border-bottom: 1px solid #444;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .paginacion {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mi TV Station (YouTube Integrado)</h1>
+    <input type="text" id="buscador" placeholder="Buscar canal..." oninput="filtrarCanales()" />
+    <input type="file" id="cargarArchivo" accept=".json,.m3u" />
+    <button onclick="cargarCanalesInternos()">🎞️ Cargar Canales Internos</button>
+    <button onclick="mostrarFavoritos()">📁 Ver Favoritos</button>
+    <button onclick="exportarFavoritos()">💾 Exportar Favoritos</button>
+    <button onclick="desbloquearAdulto()">🔞 Desbloquear Adultos</button>
+  </header>
+  <main>
+    <div class="player-grid">
+      <div>
+        <div class="player-container" data-index="0">
+          <video id="player1" controls></video>
+        </div>
+        <div class="botones-panel">
+          <button onclick="agregarAFavoritos(0)">⭐ Guardar</button>
+          <button onclick="iniciarAleatorio(0)">🎲 Aleatorio</button>
+          <button onclick="detenerAleatorio(0)">⏹️ Detener</button>
+          <button onclick="reproducirDesdeBusqueda(0)">▶️ YouTube</button>
+        </div>
+      </div>
+      <div>
+        <div class="player-container" data-index="1">
+          <video id="player2" controls></video>
+        </div>
+        <div class="botones-panel">
+          <button onclick="agregarAFavoritos(1)">⭐ Guardar</button>
+          <button onclick="iniciarAleatorio(1)">🎲 Aleatorio</button>
+          <button onclick="detenerAleatorio(1)">⏹️ Detener</button>
+          <button onclick="reproducirDesdeBusqueda(1)">▶️ YouTube</button>
+        </div>
+      </div>
+      <div>
+        <div class="player-container" data-index="2">
+          <video id="player3" controls></video>
+        </div>
+        <div class="botones-panel">
+          <button onclick="agregarAFavoritos(2)">⭐ Guardar</button>
+          <button onclick="iniciarAleatorio(2)">🎲 Aleatorio</button>
+          <button onclick="detenerAleatorio(2)">⏹️ Detener</button>
+          <button onclick="reproducirDesdeBusqueda(2)">▶️ YouTube</button>
+        </div>
+      </div>
+      <div>
+        <div class="player-container" data-index="3">
+          <video id="player4" controls></video>
+        </div>
+        <div class="botones-panel">
+          <button onclick="agregarAFavoritos(3)">⭐ Guardar</button>
+          <button onclick="iniciarAleatorio(3)">🎲 Aleatorio</button>
+          <button onclick="detenerAleatorio(3)">⏹️ Detener</button>
+          <button onclick="reproducirDesdeBusqueda(3)">▶️ YouTube</button>
+        </div>
+      </div>
+    </div>
+    <div id="canales-inferiores"></div>
+  </main>
+
+  <div class="modal" id="modalFavoritos">
+    <div class="modal-content">
+      <h3>🎯 Favoritos</h3>
+      <ul id="listaFavoritos"></ul>
+      <button onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
