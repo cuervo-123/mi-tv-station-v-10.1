@@ -1,5 +1,4 @@
-# Guardar la descripción como archivo .txt y .html
-descripcion_txt = """Mi TV Station - Plataforma de Reproducción Multicanal Integrada
+ Mi TV Station - Plataforma de Reproducción Multicanal Integrada
 
 Mi TV Station es una plataforma web avanzada que permite a los usuarios ver miles de canales IPTV y contenidos de YouTube desde una interfaz moderna, fluida y personalizable.
 
@@ -81,16 +80,5 @@ descripcion_html = f"""<!DOCTYPE html>
     <li>Uso doméstico o profesional.</li>
   </ul>
 </body>
-</html>"""
+</html>
 
-# Guardar los archivos
-txt_path = "/mnt/data/descripcion_mi_tv_station.txt"
-html_path = "/mnt/data/descripcion_mi_tv_station.html"
-
-with open(txt_path, "w", encoding="utf-8") as f:
-    f.write(descripcion_txt)
-
-with open(html_path, "w", encoding="utf-8") as f:
-    f.write(descripcion_html)
-
-txt_path, html_path
