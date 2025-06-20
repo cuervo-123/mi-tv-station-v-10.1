@@ -35,26 +35,7 @@ Ideal para:
 - Uso doméstico, en presentaciones o para coleccionistas de canales online.
 """
 
-descripcion_html = f"""<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Descripción - Mi TV Station</title>
-  <style>
-    body {{
-      background-color: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-      line-height: 1.6;
-    }}
-    h1 {{
-      color: #00ffff;
-    }}
-    ul {{
-      margin-left: 1.5rem;
-    }}
-  </style>
+
 </head>
 <body>
   <h1>🛰️ Mi TV Station - Plataforma de Reproducción Multicanal Integrada</h1>
