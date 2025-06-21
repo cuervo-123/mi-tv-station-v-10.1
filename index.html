@@ -325,7 +325,7 @@ function reproducirEnPantallaSeleccionada(pantallaIndex) {
     .then(res => res.text())
     .then(data => {
       const canales = parseM3U(data);
-      mostrarCanales(canales);
+      mostrarCanales(canales, true);
       console.log("✅ Lista M3U cargada automáticamente");
     })
     .catch(err => console.error("❌ Error al cargar la lista M3U:", err));</script>
@@ -341,11 +341,12 @@ function reproducirEnPantallaSeleccionada(pantallaIndex) {
     <button onclick="cerrarModalPantalla()">Cancelar</button>
   </div>
 </div>
-  <script>
-  let canalesCargados = [];
+ <script>
+  let listaOriginalCanales = [];
 
-  function mostrarCanales(canales) {
-    canalesCargados = canales;
+  function mostrarCanales(canales, guardarOriginal = false) {
+    if (guardarOriginal) listaOriginalCanales = canales;
+
     const contenedor = document.getElementById("canales-inferiores");
     contenedor.innerHTML = "";
     canales.forEach((canal) => {
@@ -359,7 +360,7 @@ function reproducirEnPantallaSeleccionada(pantallaIndex) {
 
   function filtrarCanales() {
     const texto = document.getElementById("buscador").value.toLowerCase();
-    const filtrados = canalesCargados.filter(canal =>
+    const filtrados = listaOriginalCanales.filter(canal =>
       canal.nombre.toLowerCase().includes(texto)
     );
     mostrarCanales(filtrados);
