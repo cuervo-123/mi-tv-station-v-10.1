@@ -341,5 +341,35 @@ function reproducirEnPantallaSeleccionada(pantallaIndex) {
     <button onclick="cerrarModalPantalla()">Cancelar</button>
   </div>
 </div>
-</body>
+  <script>
+  let canalesCargados = [];
+
+  function mostrarCanales(canales) {
+    canalesCargados = canales;
+    const contenedor = document.getElementById("canales-inferiores");
+    contenedor.innerHTML = "";
+    canales.forEach((canal) => {
+      const div = document.createElement("div");
+      div.className = "canal";
+      div.textContent = canal.nombre;
+      div.onclick = () => mostrarModalPantalla(canal.url);
+      contenedor.appendChild(div);
+    });
+  }
+
+  function filtrarCanales() {
+    const texto = document.getElementById("buscador").value.toLowerCase();
+    const filtrados = canalesCargados.filter(canal =>
+      canal.nombre.toLowerCase().includes(texto)
+    );
+    mostrarCanales(filtrados);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const buscador = document.getElementById("buscador");
+    if (buscador) {
+      buscador.addEventListener("input", filtrarCanales);
+    }
+  });
+</script></body>
 </html>
