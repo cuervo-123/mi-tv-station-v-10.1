@@ -131,10 +131,15 @@
   </header>
   <main>
     <div class="player-grid">
+
+      
       <div>
         <div class="player-container" data-index="0">
           <video id="player1" controls></video>
         </div>
+
+      
+        
         <div class="botones-panel">
           <button onclick="agregarAFavoritos(0)">⭐ Guardar</button>
           <button onclick="iniciarAleatorio(0)">🎲 Aleatorio</button>
@@ -177,6 +182,11 @@
       </div>
     </div>
     <div id="canales-inferiores"></div>
+    <div id="carrusel-wrapper">
+      <button class="flecha-carrusel flecha-izquierda" onclick="scrollCarrusel(-1)">⬅️</button>
+      <div id="canales-inferiores"></div>
+      <button class="flecha-carrusel flecha-derecha" onclick="scrollCarrusel(1)">➡️</button>
+    </div>
   </main>
 
   <div class="modal" id="modalFavoritos">
@@ -186,7 +196,13 @@
       <button onclick="cerrarModal()">Cerrar</button>
     </div>
   </div>
-
+  <script>
+    function scrollCarrusel(direccion) {
+      const carrusel = document.getElementById("canales-inferiores");
+      const cantidad = 300 * direccion;
+      carrusel.scrollBy({ left: cantidad, behavior: "smooth" });
+    }
+  </script>
   <script src="main.js"></script>
 
   <script>
