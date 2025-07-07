@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mi TV Station (YouTube Integrado)</title>
+  <title>Mi TV Station (YouTube Integrado)</title>
   <style>
     body {
       background-color: #111;
@@ -29,6 +29,7 @@
       gap: 0.5rem;
       padding: 1rem;
       background: #222;
+      scroll-behavior: smooth;
     }
     .canal {
       background: #333;
@@ -109,19 +110,57 @@
       gap: 1rem;
       padding: 1rem;
     }
+    .modal h3 {
+      color: white;
+      text-align: center;
+    }
+    .modal-content button {
+      background: #444;
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-content button:hover {
+      background: #666;
+    }
+
+    .flecha-carrusel {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      color: white;
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .flecha-izquierda {
+      left: 5px;
+    }
+    .flecha-derecha {
+      right: 5px;
+    }
+    #carrusel-wrapper {
+      position: relative;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Mi TV Station (YouTube Integrado)</h1>
-
     <div id="youtube-controls" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-      <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1; padding: 0.5rem;" />
-      <button onclick="buscarYT()">🔍 Buscar</button>
-      <button onclick="toggleRotacion()">⏸️ Pausar</button>
-      <button onclick="siguienteVideo()">⏭️ Siguiente</button>
-    </div>
-    
+        <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1; padding: 0.5rem;" />
+        <button onclick="buscarYT()">🔍 Buscar</button>
+        <button onclick="toggleRotacion()">⏸️ Pausar</button>
+        <button onclick="siguienteVideo()">⏭️ Siguiente</button>
+      </div>
+      
     <input type="text" id="buscador" placeholder="Buscar canal..." oninput="filtrarCanales()" />
     <input type="file" id="cargarArchivo" accept=".json,.m3u" />
     <button onclick="cargarCanalesInternos()">🎞️ Cargar Canales Internos</button>
@@ -131,15 +170,10 @@
   </header>
   <main>
     <div class="player-grid">
-
-      
       <div>
         <div class="player-container" data-index="0">
           <video id="player1" controls></video>
         </div>
-
-      
-        
         <div class="botones-panel">
           <button onclick="agregarAFavoritos(0)">⭐ Guardar</button>
           <button onclick="iniciarAleatorio(0)">🎲 Aleatorio</button>
@@ -181,7 +215,7 @@
         </div>
       </div>
     </div>
-    <div id="canales-inferiores"></div>
+
     <div id="carrusel-wrapper">
       <button class="flecha-carrusel flecha-izquierda" onclick="scrollCarrusel(-1)">⬅️</button>
       <div id="canales-inferiores"></div>
@@ -196,15 +230,125 @@
       <button onclick="cerrarModal()">Cerrar</button>
     </div>
   </div>
+
+  <div class="modal" id="modalPantalla">
+    <div class="modal-content">
+      <h3>🖥️ ¿En qué pantalla quieres ver este canal?</h3>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin: 1rem 0;">
+        <button onclick="reproducirEnPantallaSeleccionada(0)">Pantalla 1</button>
+        <button onclick="reproducirEnPantallaSeleccionada(1)">Pantalla 2</button>
+        <button onclick="reproducirEnPantallaSeleccionada(2)">Pantalla 3</button>
+        <button onclick="reproducirEnPantallaSeleccionada(3)">Pantalla 4</button>
+      </div>
+      <button onclick="cerrarModalPantalla()">Cancelar</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="main.js"></script>
   <script>
     function scrollCarrusel(direccion) {
       const carrusel = document.getElementById("canales-inferiores");
       const cantidad = 300 * direccion;
       carrusel.scrollBy({ left: cantidad, behavior: "smooth" });
     }
-  </script>
-  <script src="main.js"></script>
 
+    function parseM3U(texto) {
+      const lineas = texto.split('\n');
+      const canales = [];
+      for (let i = 0; i < lineas.length; i++) {
+        const linea = lineas[i].trim();
+        if (linea.startsWith('#EXTINF')) {
+          const titulo = linea.split(',')[1]?.trim() || 'Canal sin nombre';
+          const url = lineas[i + 1]?.trim();
+          if (url && url.startsWith('http')) {
+            canales.push({ nombre: titulo, url });
+          }
+        }
+      }
+      return canales;
+    }
+
+    let canalSeleccionado = null;
+    let listaOriginalCanales = [];
+
+    function mostrarCanales(canales, guardarOriginal = false) {
+      if (guardarOriginal) listaOriginalCanales = canales;
+      const contenedor = document.getElementById("canales-inferiores");
+      contenedor.innerHTML = "";
+      canales.forEach((canal) => {
+        const div = document.createElement("div");
+        div.className = "canal";
+        div.textContent = canal.nombre;
+        div.onclick = () => mostrarModalPantalla(canal.url);
+        contenedor.appendChild(div);
+      });
+    }
+
+    function mostrarModalPantalla(url) {
+      canalSeleccionado = url;
+      document.getElementById("modalPantalla").style.display = "flex";
+    }
+
+    function cerrarModalPantalla() {
+      document.getElementById("modalPantalla").style.display = "none";
+      canalSeleccionado = null;
+    }
+
+    function reproducirEnPantallaSeleccionada(pantallaIndex) {
+      if (canalSeleccionado) {
+        reproducirCanal(canalSeleccionado, pantallaIndex);
+      }
+      cerrarModalPantalla();
+    }
+
+    function reproducirCanal(url, playerIndex) {
+      const player = document.getElementById(`player${playerIndex + 1}`);
+      if (player.hlsInstance) {
+        player.hlsInstance.destroy();
+      }
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(player);
+        player.hlsInstance = hls;
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          player.play();
+        });
+      } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+        player.src = url;
+        player.addEventListener('loadedmetadata', function () {
+          player.play();
+        });
+      } else {
+        alert("Tu navegador no soporta la reproducción de este canal.");
+      }
+    }
+
+    function filtrarCanales() {
+      const texto = document.getElementById("buscador").value.toLowerCase();
+      const filtrados = listaOriginalCanales.filter(canal =>
+        canal.nombre.toLowerCase().includes(texto)
+      );
+      mostrarCanales(filtrados);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const buscador = document.getElementById("buscador");
+      if (buscador) {
+        buscador.addEventListener("input", filtrarCanales);
+      }
+    });
+
+    fetch("Country  Colombia .m3u")
+      .then(res => res.text())
+      .then(data => {
+        const canales = parseM3U(data);
+        mostrarCanales(canales, true);
+        console.log("✅ Lista M3U cargada automáticamente");
+      })
+      .catch(err => console.error("❌ Error al cargar la lista M3U:", err));
+  </script>
   <script>
     let apiKey = "AIzaSyA4NpwgJmEzBGGTzFFjShyrtWICgSSml-I";
     let rotationInterval = null;
@@ -293,4 +437,4 @@
     </script>
     
 </body>
-</html>  
+</html>
