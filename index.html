@@ -434,7 +434,30 @@
       if (currentVideoIndex >= youtubeResults.length) currentVideoIndex = 0;
       reproducirVideoActual();
     }
-   
+   let aleatoriosPorPantalla = [[], [], [], []];
+let intervalosAleatorios = [null, null, null, null];
+
+function iniciarAleatorio(playerIndex) {
+  aleatoriosPorPantalla[playerIndex] = listaOriginalCanales
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 10); // Puedes ajustar la cantidad
+
+  let i = 0;
+  clearInterval(intervalosAleatorios[playerIndex]);
+  intervalosAleatorios[playerIndex] = setInterval(() => {
+    const canal = aleatoriosPorPantalla[playerIndex][i % aleatoriosPorPantalla[playerIndex].length];
+    if (canal) {
+      reproducirCanal(canal.url, playerIndex);
+    }
+    i++;
+  }, 60000); // Cambia canal cada 60 segundos
+}
+
+function detenerAleatorio(playerIndex) {
+  clearInterval(intervalosAleatorios[playerIndex]);
+  intervalosAleatorios[playerIndex] = null;
+  alert("Aleatorio detenido en pantalla " + (playerIndex + 1));
+}
     </script>
     
 </body>
