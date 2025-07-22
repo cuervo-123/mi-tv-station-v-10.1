@@ -154,6 +154,12 @@
 <body>
   <header>
     <h1>Mi TV Station (YouTube Integrado)</h1>
+<div id="carrusel-wrapper">
+      <button class="flecha-carrusel flecha-izquierda" onclick="scrollCarrusel(-1)">⬅️</button>
+      <div id="canales-inferiores"></div>
+      <button class="flecha-carrusel flecha-derecha" onclick="scrollCarrusel(1)">➡️</button>
+    </div>
+    
     <div id="youtube-controls" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
         <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1; padding: 0.5rem;" />
         <button onclick="buscarYT()">🔍 Buscar</button>
