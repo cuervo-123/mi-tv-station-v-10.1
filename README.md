@@ -4,9 +4,8 @@ Mi TV Station es una plataforma web avanzada que permite a los usuarios ver mile
 
 Nuevas funciones destacadas:
 
-- Carga automática de listas M3U internas
-  El sistema carga automáticamente un archivo de canales predefinido con más de 10.000 entradas al iniciar la app, sin necesidad de que el usuario suba archivos manualmente.
-
+- Cargador  de listas M3U 
+  El sistema  permite cargar  archivo de canales .m3u
 - Buscador de canales en tiempo real
   Encuentra rápidamente tu canal favorito escribiendo su nombre o parte del mismo.
 
@@ -19,12 +18,10 @@ Nuevas funciones destacadas:
 - Reproducción aleatoria y control temporal
   Activa la función aleatoria para que un canal empiece desde un punto al azar o deténla cuando lo desees.
 
-- Carga externa de archivos .m3u o .json
+- Carga externa de archivos .m3u 
   También puedes subir tus propias listas personalizadas desde tu dispositivo Android, PC o navegador compatible.
 
-- Modo adultos protegido por desbloqueo visual
-  Sección de contenido para adultos oculta, accesible solo mediante acción específica del usuario.
-
+- 
 - Estilo oscuro elegante y diseño adaptativo
   Perfecto para Smart TVs, tablets o móviles, con una interfaz limpia, moderna y cómoda para la vista.
 
@@ -43,13 +40,12 @@ Ideal para:
 
   <h2>🔧 Nuevas funciones destacadas:</h2>
   <ul>
-    <li><strong>📡 Carga automática de listas M3U internas:</strong> carga automáticamente un archivo de canales con más de 10.000 entradas al iniciar.</li>
+    
     <li><strong>🔍 Buscador de canales en tiempo real:</strong> encuentra canales rápidamente escribiendo su nombre.</li>
     <li><strong>📺 Selector de pantalla elegante (4 pantallas):</strong> elige visualmente dónde ver cada canal.</li>
     <li><strong>💾 Sistema de favoritos:</strong> guarda tus canales preferidos fácilmente.</li>
     <li><strong>🎲 Reproducción aleatoria:</strong> activa reproducción desde un punto aleatorio.</li>
     <li><strong>📁 Carga externa de archivos:</strong> permite subir tus propias listas .m3u o .json.</li>
-    <li><strong>🔐 Modo adultos con desbloqueo:</strong> acceso visual protegido para contenido sensible.</li>
     <li><strong>🖼️ Estilo oscuro adaptativo:</strong> ideal para TV, móviles y tablets.</li>
   </ul>
 
