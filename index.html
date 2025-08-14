@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mi TV Station (YouTube Integrado)</title>
+  <title>THE APPTV CENTRAL</title>
   <style>
     body {
-      background-color: #111;
-      color: #000000;
+      background-color: #868980;
+      color: #3a4e6e;
       font-family: sans-serif;
       margin: 0;
       padding: 0;
@@ -28,10 +28,11 @@
       overflow-x: auto;
       gap: 0.5rem;
       padding: 1rem;
-      background: #222;
+      background: #1e1f33;  
+      scroll-behavior: smooth;
     }
     .canal {
-      background: #333;
+      background: #80f077; 
       border-radius: 10px;
       padding: 0.5rem 1rem;
       cursor: pointer;
@@ -39,7 +40,7 @@
       flex-shrink: 0;
     }
     .canal:hover {
-      background: #555;
+      background: #d4d4ea;
     }
     .player-grid {
       display: grid;
@@ -51,7 +52,7 @@
       position: relative;
       width: 100%;
       height: 30vh;
-      background: #000;
+      background: #868980;
     }
     video, .player-container iframe {
       width: 100%;
@@ -62,17 +63,19 @@
       margin-top: 0.5rem;
       display: flex;
       gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
     }
     button {
       padding: 0.3rem 0.6rem;
-      background: #444;
+      background:#5892bd;
       border: none;
       border-radius: 5px;
       color: white;
       cursor: pointer;
     }
     button:hover {
-      background: #666;
+      background: #5892bd;
     }
     .modal {
       position: fixed;
@@ -85,7 +88,7 @@
       z-index: 1000;
     }
     .modal-content {
-      background: #222;
+      background: #ac2c2c;
       padding: 1rem;
       border-radius: 10px;
       width: 80%;
@@ -98,7 +101,7 @@
     }
     #listaFavoritos li {
       padding: 0.5rem;
-      border-bottom: 1px solid #444;
+      border-bottom: 1px solid #eeeeee;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -109,102 +112,366 @@
       gap: 1rem;
       padding: 1rem;
     }
+    .modal h3 {
+      color: black;
+      text-align: center;
+    }
+    .modal-content button {
+      background: #d6d7dc;
+      border: none;
+      color: black;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-content button:hover {
+      background: #8fce00;
+    }
+    .flecha-carrusel {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      color: white;
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .flecha-izquierda {
+      left: 5px;
+    }
+    .flecha-derecha {
+      right: 5px;
+    }
+    #carrusel-wrapper {
+      position: relative;
+    }
+    .fullscreen-iframe {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 9999 !important;
+      background: black !important;
+    }
+    .fullscreen-iframe-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 10000;
+      background: #fff;
+      color: #000;
+      border: 2px solid #000;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    /* 👇 CSS mínimo para pestañas y grilla dividida */
+    .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
+    .tab { padding:6px 10px; border:1px solid #444; border-radius:6px; cursor:pointer; background:#2b2b2b; color:#fff; }
+    .tab.active { background:#333; }
+    .grid-split { display:grid; gap:8px; width:100%; height:100%; }
+    .site-select { max-width: 420px; width: 100%; }
+    .site-controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Mi TV Station (YouTube Integrado)</h1>
-
-    <div id="youtube-controls" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-      <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1; padding: 0.5rem;" />
-      <button onclick="buscarYT()">🔍 Buscar</button>
-      <button onclick="toggleRotacion()">⏸️ Pausar</button>
-      <button onclick="siguienteVideo()">⏭️ Siguiente</button>
-    </div>
-    
-    <input type="text" id="buscador" placeholder="Buscar canal..." oninput="filtrarCanales()" />
-    <input type="file" id="cargarArchivo" accept=".json,.m3u,.m3u8" />
-    <button onclick="cargarCanalesInternos()">🎞️ Cargar Canales Internos</button>
-    <button onclick="mostrarFavoritos()">📁 Ver Favoritos</button>
-    <button onclick="exportarFavoritos()">💾 Exportar Favoritos</button>
-    <button onclick="desbloquearAdulto()">🔐🔑 Desbloquear Adultos</button>
-  </header>
-  <main>
-    <div class="player-grid">
-
-      
-      <div>
-        <div class="player-container" data-index="0">
-          <video id="player1" controls></video>
-        </div>
-
-      
-        
-        <div class="botones-panel">
-          <button onclick="agregarAFavoritos(0)">⭐ Guardar</button>
-          <button onclick="iniciarAleatorio(0)">🎲 Aleatorio</button>
-          <button onclick="detenerAleatorio(0)">⏹️ Detener</button>
-          <button onclick="reproducirDesdeBusqueda(0)">▶️ YouTube</button>
-        </div>
-      </div>
-      <div>
-        <div class="player-container" data-index="1">
-          <video id="player2" controls></video>
-        </div>
-        <div class="botones-panel">
-          <button onclick="agregarAFavoritos(1)">⭐ Guardar</button>
-          <button onclick="iniciarAleatorio(1)">🎲 Aleatorio</button>
-          <button onclick="detenerAleatorio(1)">⏹️ Detener</button>
-          <button onclick="reproducirDesdeBusqueda(1)">▶️ YouTube</button>
-        </div>
-      </div>
-      <div>
-        <div class="player-container" data-index="2">
-          <video id="player3" controls></video>
-        </div>
-        <div class="botones-panel">
-          <button onclick="agregarAFavoritos(2)">⭐ Guardar</button>
-          <button onclick="iniciarAleatorio(2)">🎲 Aleatorio</button>
-          <button onclick="detenerAleatorio(2)">⏹️ Detener</button>
-          <button onclick="reproducirDesdeBusqueda(2)">▶️ YouTube</button>
-        </div>
-      </div>
-      <div>
-        <div class="player-container" data-index="3">
-          <video id="player4" controls></video>
-        </div>
-        <div class="botones-panel">
-          <button onclick="agregarAFavoritos(3)">⭐ Guardar</button>
-          <button onclick="iniciarAleatorio(3)">🎲 Aleatorio</button>
-          <button onclick="detenerAleatorio(3)">⏹️ Detener</button>
-          <button onclick="reproducirDesdeBusqueda(3)">▶️ YouTube</button>
-        </div>
-      </div>
-    </div>
-    <div id="canales-inferiores"></div>
+    <header>
+        <h1>THE APPTV CENTRAL</h1>
     <div id="carrusel-wrapper">
-      <button class="flecha-carrusel flecha-izquierda" onclick="scrollCarrusel(-1)">⬅️</button>
-      <div id="canales-inferiores"></div>
-      <button class="flecha-carrusel flecha-derecha" onclick="scrollCarrusel(1)">➡️</button>
-    </div>
-  </main>
+          <button class="flecha-carrusel flecha-izquierda" onclick="scrollCarrusel(-1)">⬅️</button>
+          <div id="canales-inferiores"></div>
+          <button class="flecha-carrusel flecha-derecha" onclick="scrollCarrusel(1)">➡️</button>
+        </div>
+        
+        <div id="youtube-controls" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1; padding: 0.5rem;" />
+            <button onclick="buscarYT()">🔍 Buscar</button>
+            <button onclick="toggleRotacion()">⏸️ Pausar</button>
+            <button onclick="siguienteVideo()">⏭️ Siguiente</button>
+          </div>
+          
+        <input type="text" id="buscador" placeholder="Buscar canal..." oninput="filtrarCanales()" />
+        <input type="file" id="cargarArchivo" accept=".json,.m3u8,.m3u" />
+        <button onclick="cargarCanalesInternos()">🎞️ Cargar Canales Internos</button>
+        <button onclick="mostrarFavoritos()">📁 Ver Favoritos</button>
+        <button onclick="exportarFavoritos()">💾 Exportar Favoritos</button>
+        <button onclick="desbloquearAdulto()">🔐🔑 Desbloquear Adultos</button>
+      </header>
+      <main>
+        <div class="player-grid">
+          <!-- MONITOR 1 -->
+          <div>
+            <div class="player-container" data-index="0">
+              <video id="player1" controls></video>
+            </div>
+            <div class="botones-panel">
+              <button onclick="agregarAFavoritos(0)">⭐ Guardar</button>
+              <button onclick="iniciarAleatorio(0)">🎲 Aleatorio</button>
+              <button onclick="detenerAleatorio(0)">⏹️ Detener</button>
+              <button onclick="reproducirDesdeBusqueda(0)">▶️ YouTube</button>
+            </div>
 
-  <div class="modal" id="modalFavoritos">
-    <div class="modal-content">
-      <h3>🎯 Favoritos</h3>
-      <ul id="listaFavoritos"></ul>
-      <button onclick="cerrarModal()">Cerrar</button>
-    </div>
-  </div>
+            <!-- 👇 NUEVO: selector múltiple de sitios por monitor -->
+            <div class="botones-panel">
+              <select id="siteSelect0" multiple size="5" class="site-select"></select>
+              <div class="site-controls">
+                <label style="display:flex;align-items:center;gap:6px;">
+                  <input type="checkbox" id="splitMode0" checked> Vista dividida (si hay varios)
+                </label>
+                <button onclick="cargarGraficoTV(0)">🌐 Abrir sitios</button>
+                <button onclick="guardarSeleccionSitios(0)">💾 Guardar selección</button>
+                <button onclick="limpiarSeleccionSitios(0)">🧹 Limpiar</button>
+              </div>
+            </div>
+
+            <div class="botones-panel">
+              <input type="text" id="symbolInput0" placeholder="Símbolo (ej: EURUSD)" style="flex: 1; padding: 0.5rem;" />
+              <button onclick="cargarGraficoTV(0)">📈 Gráfico</button>
+              <button onclick="quitarGraficoTV(0)">🗑️ Quitar</button>
+            </div>
+          </div>
+
+          <!-- MONITOR 2 -->
+          <div>
+            <div class="player-container" data-index="1">
+              <video id="player2" controls></video>
+            </div>
+            <div class="botones-panel">
+              <button onclick="agregarAFavoritos(1)">⭐ Guardar</button>
+              <button onclick="iniciarAleatorio(1)">🎲 Aleatorio</button>
+              <button onclick="detenerAleatorio(1)">⏹️ Detener</button>
+              <button onclick="reproducirDesdeBusqueda(1)">▶️ YouTube</button>
+            </div>
+
+            <!-- 👇 NUEVO: selector múltiple de sitios por monitor -->
+            <div class="botones-panel">
+              <select id="siteSelect1" multiple size="5" class="site-select"></select>
+              <div class="site-controls">
+                <label style="display:flex;align-items:center;gap:6px;">
+                  <input type="checkbox" id="splitMode1" checked> Vista dividida (si hay varios)
+                </label>
+                <button onclick="cargarGraficoTV(1)">🌐 Abrir sitios</button>
+                <button onclick="guardarSeleccionSitios(1)">💾 Guardar selección</button>
+                <button onclick="limpiarSeleccionSitios(1)">🧹 Limpiar</button>
+              </div>
+            </div>
+
+            <div class="botones-panel">
+              <input type="text" id="symbolInput1" placeholder="Símbolo (ej: EURUSD)" style="flex: 1; padding: 0.5rem;" />
+              <button onclick="cargarGraficoTV(1)">📈 Gráfico</button>
+              <button onclick="quitarGraficoTV(1)">🗑️ Quitar</button>
+            </div>
+          </div>
+
+          <!-- MONITOR 3 -->
+          <div>
+            <div class="player-container" data-index="2">
+              <video id="player3" controls></video>
+            </div>
+            <div class="botones-panel">
+              <button onclick="agregarAFavoritos(2)">⭐ Guardar</button>
+              <button onclick="iniciarAleatorio(2)">🎲 Aleatorio</button>
+              <button onclick="detenerAleatorio(2)">⏹️ Detener</button>
+              <button onclick="reproducirDesdeBusqueda(2)">▶️ YouTube</button>
+            </div>
+
+            <!-- 👇 NUEVO: selector múltiple de sitios por monitor -->
+            <div class="botones-panel">
+              <select id="siteSelect2" multiple size="5" class="site-select"></select>
+              <div class="site-controls">
+                <label style="display:flex;align-items:center;gap:6px;">
+                  <input type="checkbox" id="splitMode2" checked> Vista dividida (si hay varios)
+                </label>
+                <button onclick="cargarGraficoTV(2)">🌐 Abrir sitios</button>
+                <button onclick="guardarSeleccionSitios(2)">💾 Guardar selección</button>
+                <button onclick="limpiarSeleccionSitios(2)">🧹 Limpiar</button>
+              </div>
+            </div>
+
+            <div class="botones-panel">
+              <input type="text" id="symbolInput2" placeholder="Símbolo (ej: EURUSD)" style="flex: 1; padding: 0.5rem;" />
+              <button onclick="cargarGraficoTV(2)">📈 Gráfico</button>
+              <button onclick="quitarGraficoTV(2)">🗑️ Quitar</button>
+            </div>
+          </div>
+
+          <!-- MONITOR 4 -->
+          <div>
+            <div class="player-container" data-index="3">
+              <video id="player4" controls></video>
+            </div>
+            <div class="botones-panel">
+              <button onclick="agregarAFavoritos(3)">⭐ Guardar</button>
+              <button onclick="iniciarAleatorio(3)">🎲 Aleatorio</button>
+              <button onclick="detenerAleatorio(3)">⏹️ Detener</button>
+              <button onclick="reproducirDesdeBusqueda(3)">▶️ YouTube</button>
+            </div>
+
+            <!-- 👇 NUEVO: selector múltiple de sitios por monitor -->
+            <div class="botones-panel">
+              <select id="siteSelect3" multiple size="5" class="site-select"></select>
+              <div class="site-controls">
+                <label style="display:flex;align-items:center;gap:6px;">
+                  <input type="checkbox" id="splitMode3" checked> Vista dividida (si hay varios)
+                </label>
+                <button onclick="cargarGraficoTV(3)">🌐 Abrir sitios</button>
+                <button onclick="guardarSeleccionSitios(3)">💾 Guardar selección</button>
+                <button onclick="limpiarSeleccionSitios(3)">🧹 Limpiar</button>
+              </div>
+            </div>
+
+            <div class="botones-panel">
+              <input type="text" id="symbolInput3" placeholder="Símbolo (ej: EURUSD)" style="flex: 1; padding: 0.5rem;" />
+              <button onclick="cargarGraficoTV(3)">📈 Gráfico</button>
+              <button onclick="quitarGraficoTV(3)">🗑️ Quitar</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    
+      <div class="modal" id="modalFavoritos">
+        <div class="modal-content">
+          <h3>🎯 Favoritos</h3>
+          <ul id="listaFavoritos"></ul>
+          <button onclick="cerrarModal()">Cerrar</button>
+        </div>
+      </div>
+    
+      <div class="modal" id="modalPantalla">
+        <div class="modal-content">
+          <h3>🖥️ ¿En qué pantalla quieres ver este canal?</h3>
+          <div style="display: flex; gap: 1rem; justify-content: center; margin: 1rem 0;">
+            <button onclick="reproducirEnPantallaSeleccionada(0)">Pantalla 1</button>
+            <button onclick="reproducirEnPantallaSeleccionada(1)">Pantalla 2</button>
+            <button onclick="reproducirEnPantallaSeleccionada(2)">Pantalla 3</button>
+            <button onclick="reproducirEnPantallaSeleccionada(3)">Pantalla 4</button>
+          </div>
+          <button onclick="cerrarModalPantalla()">Cancelar</button>
+        </div>
+      </div>
+    
+      <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+      <script src="main.js"></script>
   <script>
     function scrollCarrusel(direccion) {
       const carrusel = document.getElementById("canales-inferiores");
       const cantidad = 300 * direccion;
       carrusel.scrollBy({ left: cantidad, behavior: "smooth" });
     }
-  </script>
-  <script src="main.js"></script>
 
+    function parseM3U(texto) {
+      const lineas = texto.split('\n');
+      const canales = [];
+      for (let i = 0; i < lineas.length; i++) {
+        const linea = lineas[i].trim();
+        if (linea.startsWith('#EXTINF')) {
+          const titulo = linea.split(',')[1]?.trim() || 'Canal sin nombre';
+          const url = lineas[i + 1]?.trim();
+          if (url && url.startsWith('http')) {
+            canales.push({ nombre: titulo, url });
+          }
+        }
+      }
+      return canales;
+    }
+
+    let canalSeleccionado = null;
+    let listaOriginalCanales = [];
+
+    function mostrarCanales(canales, guardarOriginal = false) {
+      if (guardarOriginal) listaOriginalCanales = canales;
+      const contenedor = document.getElementById("canales-inferiores");
+      contenedor.innerHTML = "";
+      canales.forEach((canal) => {
+        const div = document.createElement("div");
+        div.className = "canal";
+        div.textContent = canal.nombre;
+        div.onclick = () => mostrarModalPantalla(canal.url);
+        contenedor.appendChild(div);
+      });
+    }
+
+    function mostrarModalPantalla(url) {
+      canalSeleccionado = url;
+      document.getElementById("modalPantalla").style.display = "flex";
+    }
+
+    function cerrarModalPantalla() {
+      document.getElementById("modalPantalla").style.display = "none";
+      canalSeleccionado = null;
+    }
+
+    function reproducirEnPantallaSeleccionada(pantallaIndex) {
+      if (canalSeleccionado) {
+        const container = document.querySelector(`.player-container[data-index='${pantallaIndex}']`);
+        container.innerHTML = `<video id="player${pantallaIndex + 1}" controls></video>`;
+        reproducirCanal(canalSeleccionado, pantallaIndex);
+      }
+      cerrarModalPantalla();
+    }
+
+    function reproducirCanal(url, playerIndex) {
+      const player = document.getElementById(`player${playerIndex + 1}`);
+      if (player.hlsInstance) {
+        player.hlsInstance.destroy();
+      }
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(player);
+        player.hlsInstance = hls;
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          player.play();
+        });
+      } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+        player.src = url;
+        player.addEventListener('loadedmetadata', function () {
+          player.play();
+        });
+      } else {
+        alert("Tu navegador no soporta la reproducción de este canal.");
+      }
+    }
+
+    function filtrarCanales() {
+      const texto = document.getElementById("buscador").value.toLowerCase();
+      const filtrados = listaOriginalCanales.filter(canal =>
+        canal.nombre.toLowerCase().includes(texto)
+      );
+      mostrarCanales(filtrados);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const buscador = document.getElementById("buscador");
+      if (buscador) {
+        buscador.addEventListener("input", filtrarCanales);
+      }
+    });
+
+   Promise.all([
+  fetch("update2.m3u").then(res => res.text()),
+  fetch("colombia.m3u").then(res => res.text()),
+  fetch("brazil.m3u").then(res => res.text())
+])
+.then(([data1, data2, data3]) => {
+  const canales1 = parseM3U(data1);
+  const canales2 = parseM3U(data2);
+  const canales3 = parseM3U(data3);
+
+  const todosLosCanales = [...canales1, ...canales2, ...canales3];
+  mostrarCanales(todosLosCanales, true);
+  console.log("✅ Todas las listas M3U fueron cargadas automáticamente");
+})
+.catch(err => console.error("❌ Error al cargar alguna lista M3U:", err));
+
+  </script>
   <script>
     let apiKey = "AIzaSyA4NpwgJmEzBGGTzFFjShyrtWICgSSml-I";
     let rotationInterval = null;
@@ -212,10 +479,10 @@
     let youtubeResults = [];
     let isPaused = false;
     
-    // Crea el campo y botones para búsqueda YouTube
+    // (OJO) Ya tienes controles en el HTML arriba; este bloque añade otros si se deja.
     document.addEventListener("DOMContentLoaded", () => {
       const header = document.querySelector("header");
-    
+      // Si no quieres duplicados, puedes comentar el bloque siguiente.
       const contenedor = document.createElement("div");
       contenedor.style.display = "flex";
       contenedor.style.gap = "0.5rem";
@@ -229,12 +496,11 @@
       header.appendChild(contenedor);
     });
     
-    // Ejecutar búsqueda
     function buscarYT() {
       const query = document.getElementById("youtubeSearch").value.trim();
       if (!query) return alert("Escribe una búsqueda.");
     
-      fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=${encodeURIComponent(query)}&key=${apiKey}`)
+      fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=40&q=${encodeURIComponent(query)}&key=${apiKey}`)
         .then(res => res.json())
         .then(data => {
           if (!data.items.length) return alert("No se encontraron resultados.");
@@ -249,48 +515,195 @@
         });
     }
     
-    // Reproducir video actual en monitor 1
     function reproducirVideoActual() {
       const video = youtubeResults[currentVideoIndex];
       if (!video) return;
-    
       const videoId = video.id.videoId;
       const iframe = document.createElement("iframe");
       iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0`;
       iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
       iframe.allowFullscreen = true;
-    
       const container = document.querySelector(".player-container[data-index='0']");
       container.innerHTML = "";
       container.appendChild(iframe);
     }
     
-    // Iniciar rotación cada 15 minutos
     function iniciarRotacion() {
       detenerRotacion();
       rotationInterval = setInterval(() => {
         if (!isPaused) siguienteVideo();
-      }, 15 * 60 * 1000); // 15 minutos
+      }, 3 * 60 * 1000); // 3 minutos (ajustado; tu comentario decía 1 minuto)
     }
-    
-    // Detener rotación
-    function detenerRotacion() {
-      if (rotationInterval) clearInterval(rotationInterval);
-    }
-    
-    // Pausar o reanudar rotación
+    function detenerRotacion() { if (rotationInterval) clearInterval(rotationInterval); }
     function toggleRotacion() {
       isPaused = !isPaused;
       alert(isPaused ? "⏸️ Rotación pausada." : "▶️ Rotación reanudada.");
     }
-    
-    // Pasar al siguiente video
     function siguienteVideo() {
       currentVideoIndex++;
       if (currentVideoIndex >= youtubeResults.length) currentVideoIndex = 0;
       reproducirVideoActual();
     }
-    </script>
-    
+
+    /* =========================
+       👇 SITIOS FAVORITOS (EDITA AQUÍ)
+       ========================= */
+    const FAVORITE_SITES = [
+      // 👉 EDITA AQUÍ: agrega/quita tus sitios
+      { label: "DJ App", url: "https://cuervo-123.github.io/GLOBALTV4YOUPLUS/" },
+      { label: "TradingView", url: "https://cuervo-123.github.io/tv4you/" },
+      { label: "Google", url: "https://cuervo-123.github.io/mi-tv-station/" },
+      { label: "DJ App", url: "https://cuervo-123.github.io/GLOBALTV4YOU/" },
+      { label: "DJ App", url: "https://cuervo-123.github.io/Editor-iptv-Plus/" },
+      { label: "DJ App", url: "https://wap.tizam.club/fil_my_dlya_vzroslyh/podrostki_18/ryzhen_kie_ochen_seksual_ny_5/" },
+      { label: "DJ App", url: "https://cuervo-123.github.io/GLOBALTV4YOUPLUS/" },
+
+      
+    ];
+    const LS_KEY = (idx) => `siteSelection:${idx}`;
+    const normalizeUrl = (u) => {
+      if (!u) return "";
+      let url = u.trim();
+      if (!/^https?:\/\//i.test(url)) url = "https://" + url.replace(/^\/+/, "");
+      return url;
+    };
+
+    function initSitePicker(index) {
+      const select = document.getElementById(`siteSelect${index}`);
+      if (!select) return;
+      select.innerHTML = FAVORITE_SITES.map(s =>
+        `<option value="${s.url}">${s.label} — ${s.url}</option>`
+      ).join("");
+      const saved = JSON.parse(localStorage.getItem(LS_KEY(index)) || "[]");
+      Array.from(select.options).forEach(opt => {
+        if (saved.includes(opt.value)) opt.selected = true;
+      });
+    }
+
+    function guardarSeleccionSitios(index) {
+      const select = document.getElementById(`siteSelect${index}`);
+      const seleccion = Array.from(select.selectedOptions).map(o => o.value);
+      localStorage.setItem(LS_KEY(index), JSON.stringify(seleccion));
+      alert("Selección guardada ✅");
+    }
+
+    function limpiarSeleccionSitios(index) {
+      const select = document.getElementById(`siteSelect${index}`);
+      Array.from(select.options).forEach(o => (o.selected = false));
+      localStorage.removeItem(LS_KEY(index));
+    }
+
+    function renderIframesInContainer(index, urls) {
+      const container = document.querySelector(`.player-container[data-index='${index}']`);
+      if (!container) return;
+      const cleanUrls = urls.map(normalizeUrl).filter(Boolean);
+      if (cleanUrls.length === 0) {
+        alert("Selecciona al menos 1 sitio.");
+        return;
+      }
+      const split = document.getElementById(`splitMode${index}`)?.checked && cleanUrls.length > 1;
+
+      if (split) {
+        const n = cleanUrls.length;
+        let cols = 2;
+        if (n === 3) cols = 3;
+        if (n >= 4) cols = 3;
+        const gridStyle = `grid-template-columns: repeat(${cols}, 1fr); grid-auto-rows: minmax(200px, 1fr);`;
+        container.innerHTML = `
+          <div class="grid-split" style="${gridStyle}; width:100%; height:100%;">
+            ${cleanUrls.map(u => `
+              <iframe src="${u}" style="width:100%; height:100%; border:0;"
+                      frameborder="0" scrolling="auto"
+                      allow="fullscreen; clipboard-read; clipboard-write"></iframe>
+            `).join("")}
+          </div>
+        `;
+      } else if (cleanUrls.length === 1) {
+        container.innerHTML = `
+          <iframe id="iframe-${index}-0" src="${cleanUrls[0]}"
+                  style="width:100%; height:100%; border:0;" frameborder="0"
+                  scrolling="auto" allow="fullscreen; clipboard-read; clipboard-write"></iframe>
+        `;
+      } else {
+        const tabs = cleanUrls.map((u, i) =>
+          `<button class="tab ${i===0?'active':''}" data-tab="${i}" onclick="activarTab(${index}, ${i})">${new URL(u).hostname}</button>`
+        ).join("");
+        const iframes = cleanUrls.map((u, i) => `
+          <iframe id="iframe-${index}-${i}" src="${u}"
+                  style="width:100%; height:calc(100% - 46px); border:0; display:${i===0?'block':'none'};"
+                  frameborder="0" scrolling="auto" allow="fullscreen; clipboard-read; clipboard-write"></iframe>
+        `).join("");
+        container.innerHTML = `
+          <div class="tabs" id="tabs-${index}">${tabs}</div>
+          <div style="width:100%; height:calc(100% - 46px);">${iframes}</div>
+        `;
+      }
+    }
+
+    function activarTab(index, i) {
+      const tabsWrap = document.getElementById(`tabs-${index}`);
+      if (!tabsWrap) return;
+      tabsWrap.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      const target = tabsWrap.querySelector(`.tab[data-tab='${i}']`);
+      if (target) target.classList.add("active");
+      const container = document.querySelector(`.player-container[data-index='${index}']`);
+      if (!container) return;
+      container.querySelectorAll("iframe[id^='iframe-']").forEach((f, idx) => {
+        f.style.display = (idx === i) ? "block" : "none";
+      });
+    }
+
+    /* 🔄 ADAPTADA: usa el dropdown múltiple; si no hay selección, cae a dj.app */
+    function cargarGraficoTV(index) {
+      const select = document.getElementById(`siteSelect${index}`);
+      const seleccion = select ? Array.from(select.selectedOptions).map(o => o.value) : [];
+      const urls = (seleccion.length > 0) ? seleccion : ["https://cuervo-123.github.io/GLOBALTV4YOUPLUS/"];
+      renderIframesInContainer(index, urls);
+    }
+
+    function quitarGraficoTV(index) {
+      const container = document.querySelector(`.player-container[data-index='${index}']`);
+      container.innerHTML = `<video id="player${index + 1}" controls></video>`;
+    }
+
+    function toggleFullscreenGrafico(index) {
+      const container = document.querySelector(`.player-container[data-index='${index}']`);
+      const iframe = container.querySelector('iframe');
+      if (!iframe) return alert("No hay gráfico para esta pantalla.");
+      const isFullscreen = iframe.classList.toggle("fullscreen-iframe");
+      const boton = document.getElementById(`btnFullscreen${index}`);
+      if (boton) boton.textContent = isFullscreen ? "❌ Salir de Fullscreen" : "🔍 Fullscreen";
+      let botonSalir = document.getElementById(`btnExitFullscreen${index}`);
+      if (isFullscreen) {
+        if (!botonSalir) {
+          botonSalir = document.createElement("button");
+          botonSalir.id = `btnExitFullscreen${index}`;
+          botonSalir.textContent = "❌ Salir de Fullscreen";
+          botonSalir.className = "fullscreen-iframe-button";
+          botonSalir.onclick = () => toggleFullscreenGrafico(index);
+          document.body.appendChild(botonSalir);
+        }
+      } else {
+        if (botonSalir) botonSalir.remove();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Inicializa los pickers para los 4 monitores
+      [0,1,2,3].forEach(initSitePicker);
+
+      // Crea botón Fullscreen para cada bloque de gráficos
+      for (let i = 0; i < 4; i++) {
+        const paneles = document.querySelectorAll(".botones-panel")[i * 3 + 2]; 
+        if (paneles) {
+          const botonFull = document.createElement("button");
+          botonFull.textContent = "🔍 Fullscreen";
+          botonFull.id = `btnFullscreen${i}`;
+          botonFull.onclick = () => toggleFullscreenGrafico(i);
+          paneles.appendChild(botonFull);
+        }
+      }
+    });
+  </script>
 </body>
-</html>  
+</html>
