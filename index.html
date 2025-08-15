@@ -460,8 +460,8 @@
 
    Promise.all([
   fetch("Country Colombia.m3u").then(res => res.text()),
-  fetch("colombia.m3u").then(res => res.text()),
-  fetch("brazil.m3u").then(res => res.text())
+  fetch("Country Colombia.m3u").then(res => res.text()),
+  fetch("Country Colombia.m3u").then(res => res.text())
 ])
 .then(([data1, data2, data3]) => {
   const canales1 = parseM3U(data1);
