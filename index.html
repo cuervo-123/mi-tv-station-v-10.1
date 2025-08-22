@@ -40,6 +40,7 @@
   </style>
 </head>
 <body>
+  <!-- Google CSE (opcional) -->
   <script async src="https://cse.google.com/cse.js?cx=04f5ff6986fe641ad"></script>
   <div class="gcse-search"></div>
 
@@ -201,32 +202,57 @@
     </div>
   </div>
 
+  <!-- Librería HLS -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <!-- Evito conflictos: si tenías un main.js que tocaba lo mismo, mejor desactivarlo
+  <script src="main.js"></script>
+  -->
 
   <script>
-    /* ======= Carrusel ======= */
+    /* ================== HUD de estado ================== */
+    const statusBox = document.createElement('div');
+    statusBox.style.cssText = 'position:fixed;bottom:10px;left:10px;background:#111;color:#fff;padding:10px;border-radius:8px;font:12px/1.2 monospace;max-width:60vw;z-index:99999;opacity:.9';
+    statusBox.innerHTML = 'M3U Loader: …';
+    document.addEventListener('DOMContentLoaded', () => document.body.appendChild(statusBox));
+    const log = (...a)=>{console.log('[M3U]',...a); statusBox.innerHTML = (statusBox.innerHTML + '<br>' + a.map(String).join(' ')).slice(-4000);};
+
+    /* ================== Carrusel ================== */
     function scrollCarrusel(direccion) {
       const carrusel = document.getElementById("canales-inferiores");
       const cantidad = 300 * direccion;
       carrusel.scrollBy({ left: cantidad, behavior: "smooth" });
     }
 
-    /* ======= Parser M3U ======= */
-    function parseM3U(texto) {
-      const lineas = texto.split('\n');
-      const canales = [];
-      for (let i = 0; i < lineas.length; i++) {
-        const linea = lineas[i].trim();
-        if (linea.startsWith('#EXTINF')) {
-          const titulo = linea.split(',')[1]?.trim() || 'Canal sin nombre';
-          const url = lineas[i + 1]?.trim();
-          if (url && url.startsWith('http')) canales.push({ nombre: titulo, url });
+    /* ================== Parser M3U tolerante ================== */
+    function parseM3U(text) {
+      const clean = (text || '').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+      const lines = clean.split('\n');
+      const out = [];
+      for (let i=0;i<lines.length;i++) {
+        const line = lines[i].trim();
+        if (!line || line.startsWith('#EXTM3U')) continue;
+
+        if (line.startsWith('#EXTINF')) {
+          let name = 'Canal sin nombre';
+          const commaIdx = line.indexOf(',');
+          if (commaIdx !== -1 && commaIdx < line.length-1) {
+            name = line.slice(commaIdx+1).trim() || name;
+          }
+          const url = (lines[i+1] || '').trim();
+          if (url && /^https?:\/\//i.test(url)) {
+            out.push({ nombre: name, url });
+            i++;
+          }
+          continue;
+        }
+        if (/^https?:\/\//i.test(line)) {
+          out.push({ nombre: line.split('/').slice(-1)[0] || 'Canal', url: line });
         }
       }
-      return canales;
+      return out;
     }
 
-    /* ======= Estado y render ======= */
+    /* ================== Render & estado ================== */
     let canalSeleccionado = null;
     let listaOriginalCanales = [];
 
@@ -234,24 +260,32 @@
       if (guardarOriginal) listaOriginalCanales = canales;
       const contenedor = document.getElementById("canales-inferiores");
       contenedor.innerHTML = "";
+      if (!canales.length) {
+        contenedor.innerHTML = '<div class="canal" style="background:#f88;color:#000">No se cargaron canales</div>';
+        return;
+      }
+      const frag = document.createDocumentFragment();
       canales.forEach((canal) => {
         const div = document.createElement("div");
         div.className = "canal";
-        div.textContent = canal.nombre;
-        div.setAttribute('data-url', canal.url); // <- clave para click delegado
-        contenedor.appendChild(div);
+        div.textContent = canal.nombre || 'Canal';
+        div.setAttribute('data-url', canal.url);
+        frag.appendChild(div);
       });
+      contenedor.appendChild(frag);
+      log('✅ Carrusel renderizado:', canales.length, 'canales');
     }
 
-    // Click delegado (no se pierden handlers al re-render)
+    // Click delegado carrusel
     document.getElementById('canales-inferiores').addEventListener('click', (e) => {
       const item = e.target.closest('.canal');
       if (!item) return;
       const url = item.getAttribute('data-url');
+      if (!url) return;
       mostrarModalPantalla(url);
     });
 
-    /* ======= Modal seleccionar pantalla ======= */
+    /* ================== Modal & reproducción ================== */
     function mostrarModalPantalla(url) {
       canalSeleccionado = url;
       document.getElementById("modalPantalla").style.display = "flex";
@@ -260,7 +294,6 @@
       document.getElementById("modalPantalla").style.display = "none";
       canalSeleccionado = null;
     }
-
     function reproducirEnPantallaSeleccionada(pantallaIndex) {
       if (canalSeleccionado) {
         const container = document.querySelector(`.player-container[data-index='${pantallaIndex}']`);
@@ -269,89 +302,117 @@
       }
       cerrarModalPantalla();
     }
-
     function reproducirCanal(url, playerIndex) {
       const player = document.getElementById(`player${playerIndex + 1}`);
       if (!player) return;
+      if (player.hlsInstance) { try { player.hlsInstance.destroy(); } catch (e) {} }
 
-      // Limpia instancia anterior de HLS si existe
-      if (player.hlsInstance) {
-        try { player.hlsInstance.destroy(); } catch (e) {}
-      }
-
-      if (Hls.isSupported()) {
+      if (window.Hls && Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(player);
         player.hlsInstance = hls;
         hls.on(Hls.Events.MANIFEST_PARSED, () => player.play().catch(()=>{}));
+        hls.on(Hls.Events.ERROR, (e,data)=> log('HLS error', data?.type, data?.details || ''));
       } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
         player.src = url;
-        player.addEventListener('loadedmetadata', () => player.play().catch(()=>{}), { once: true });
+        player.addEventListener('loadedmetadata', () => player.play().catch(()=>{}), { once:true });
       } else {
         alert("Tu navegador no soporta la reproducción de este canal.");
       }
     }
 
-    /* ======= Filtro buscador ======= */
+    /* ================== Búsqueda ================== */
     function filtrarCanales() {
-      const texto = document.getElementById("buscador").value.toLowerCase();
-      const filtrados = listaOriginalCanales.filter(c => c.nombre.toLowerCase().includes(texto));
+      const texto = (document.getElementById("buscador").value || '').toLowerCase();
+      const filtrados = listaOriginalCanales.filter(c => (c.nombre||'').toLowerCase().includes(texto));
       mostrarCanales(filtrados);
     }
     document.getElementById("buscador").addEventListener("input", filtrarCanales);
 
-    /* ======= Cargar canales internos (botón) ======= */
-    async function cargarCanalesInternos() {
+    /* ================== Carga manual (input file) ================== */
+    document.getElementById('cargarArchivo').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const ext = file.name.split('.').pop().toLowerCase();
+      const text = await file.text();
+
+      if (ext === 'json') {
+        try {
+          const data = JSON.parse(text);
+          if (Array.isArray(data)) {
+            const canales = data.map(c => ({ nombre: c.nombre || c.name || 'Canal', url: c.url }));
+            mostrarCanales(canales, true);
+            log('📤 Cargado JSON con', canales.length, 'canales');
+          } else {
+            alert('JSON inválido: debe ser un array de {nombre,url}');
+          }
+        } catch (err) {
+          alert('Error al leer el JSON');
+        }
+      } else {
+        const canales = parseM3U(text);
+        mostrarCanales(canales, true);
+        log('📤 Cargado M3U con', canales.length, 'canales');
+      }
+      e.target.value = '';
+    });
+
+    /* ================== Carga interna (botón) ================== */
+    async function cargarCanalesInternos() { await loadM3UFiles(true); }
+
+    /* ================== Auto-load de M3U ================== */
+    const M3U_FILES = [
+      // 🔧 CAMBIA AQUÍ si tus archivos tienen otros nombres o carpetas
+      'Country Colombia.m3u',
+      'Country Bolivia.m3u',
+      'Country Brazil.m3u',
+    ];
+
+    async function fetchTextSafe(path) {
+      const url = encodeURI(path.trim());
       try {
-        const rutas = [
-          // 🔧 CAMBIA AQUÍ si usas otros nombres o carpetas
-          "Country Colombia.m3u",
-          "Country Bolivia.m3u",
-          "Country Brazil.m3u",
-        ].map(p => encodeURI(p)); // por si tienen espacios
-
-        const textos = await Promise.all(rutas.map(r => fetch(r).then(res => {
-          if (!res.ok) throw new Error(`No se pudo cargar: ${r}`);
-          return res.text();
-        })));
-
-        const listas = textos.map(parseM3U);
-        const todos = listas.flat();
-        if (!todos.length) console.warn("Listas M3U vacías o sin URLs válidas");
-        mostrarCanales(todos, true);
-        console.log("✅ Listas M3U cargadas desde botón");
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        const txt = await res.text();
+        log('📥 OK', url, `(${txt.length} bytes)`);
+        return { ok:true, url, text:txt };
       } catch (err) {
-        console.error("❌ Error al cargar M3U internos:", err);
-        alert("No se pudieron cargar las listas internas. Revisa los nombres/rutas.");
+        log('❌ Fetch fail', url, String(err));
+        return { ok:false, url, error: String(err) };
       }
     }
 
-    /* ======= AUTO-LOAD M3U al inicio ======= */
-    (async function autoLoadM3U() {
-      try {
-        const rutas = [
-          // 🔧 CAMBIA AQUÍ si tus archivos se llaman distinto
-          "Country Colombia.m3u",
-          "Country Bolivia.m3u",
-          "Country Brazil.m3u",
-        ].map(p => encodeURI(p));
+    async function loadM3UFiles(fromButton=false) {
+      statusBox.innerHTML = fromButton ? 'Cargando listas (botón)…' : 'Auto-cargando listas…';
+      const results = await Promise.all(M3U_FILES.map(fetchTextSafe));
 
-        const textos = await Promise.all(rutas.map(r => fetch(r).then(res => {
-          if (!res.ok) throw new Error(`No se pudo cargar: ${r}`);
-          return res.text();
-        })));
-
-        const listas = textos.map(parseM3U);
-        const todos = listas.flat();
-        mostrarCanales(todos, true);
-        console.log("✅ Auto-load M3U completado");
-      } catch (err) {
-        console.error("❌ Auto-load M3U falló:", err);
+      const canales = [];
+      let errores = 0;
+      for (const r of results) {
+        if (r.ok) {
+          const parsed = parseM3U(r.text);
+          log('🔎 Parse', r.url, '→', parsed.length, 'canales');
+          canales.push(...parsed);
+        } else {
+          errores++;
+        }
       }
-    })();
 
-    /* ======= YouTube (igual que tenías) ======= */
+      if (!canales.length) {
+        log('⚠️ Sin canales. DEMO fallback.');
+        mostrarCanales([
+          { nombre:'DEMO Canal HLS 1', url:'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
+          { nombre:'DEMO Big Buck Bunny', url:'https://test-streams.mux.dev/bbb-abr/bbb.m3u8' },
+        ], true);
+        statusBox.innerHTML += '<br>⚠️ No se pudieron cargar tus .m3u. Revisa nombres/rutas y CORS.';
+      } else {
+        mostrarCanales(canales, true);
+        statusBox.innerHTML += `<br>✅ Cargados ${canales.length} canales (${errores} errores)`;
+      }
+    }
+
+    /* ================== YouTube ================== */
     let apiKey = "AIzaSyA4NpwgJmEzBGGTzFFjShyrtWICgSSml-I";
     let rotationInterval = null;
     let currentVideoIndex = 0;
@@ -389,7 +450,7 @@
     function toggleRotacion() { isPaused = !isPaused; alert(isPaused ? "⏸️ Rotación pausada." : "▶️ Rotación reanudada."); }
     function siguienteVideo() { currentVideoIndex = (currentVideoIndex + 1) % youtubeResults.length; reproducirVideoActual(); }
 
-    /* ======= Sitios favoritos / TradingView por monitor ======= */
+    /* ================== TradingView / sitios por monitor ================== */
     const FAVORITE_SITES = [
       { label: "Central App's", url: "https://cuervo-123.github.io/GLOBALTV4YOUPLUS/" },
       { label: "Global country Tv App", url: "https://cuervo-123.github.io/tv4you/" },
@@ -482,12 +543,12 @@
       } else { if (botonSalir) botonSalir.remove(); }
     }
 
-    /* ======= Init ======= */
+    /* ================== INIT ================== */
     document.addEventListener("DOMContentLoaded", () => {
-      // pickers para los 4 monitores
-      [0,1,2,3].forEach(initSitePicker);
+      [0,1,2,3].forEach(initSitePicker);   // TradingView pickers
+      loadM3UFiles(false);                 // Auto-load M3U al inicio
 
-      // botón Fullscreen por monitor
+      // Botones Fullscreen para cada monitor (se agregan a su panel de gráficos)
       for (let i = 0; i < 4; i++) {
         const paneles = document.querySelectorAll(".botones-panel")[i * 3 + 2];
         if (paneles) {
@@ -499,6 +560,16 @@
         }
       }
     });
+
+    /* ================== Placeholders de favoritos (tu lógica original) ================== */
+    function agregarAFavoritos(idx){ alert('Favoritos: implementar según tu estructura de datos.'); }
+    function iniciarAleatorio(idx){ alert('Aleatorio: implementar según tu lógica.'); }
+    function detenerAleatorio(idx){ alert('Detener aleatorio: implementar.'); }
+    function reproducirDesdeBusqueda(idx){ alert('YouTube por monitor: adaptar si quieres búsquedas por monitor.'); }
+    function mostrarFavoritos(){ document.getElementById('modalFavoritos').style.display='flex'; }
+    function cerrarModal(){ document.getElementById('modalFavoritos').style.display='none'; }
+    function exportarFavoritos(){ alert('Exportar favoritos: implementar según tu formato.'); }
+    function desbloquearAdulto(){ alert('Adultos: implementar PIN/clave.'); }
   </script>
 </body>
 </html>
