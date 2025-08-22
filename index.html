@@ -44,7 +44,24 @@
     #controles-doble { position: fixed; top: 10px; left: 10px; display: flex; gap: 8px; z-index: 10060; }
     #controles-doble button { padding:6px 10px; border:none; border-radius:6px; background:#00ffd5; color:#000; font-weight:700; cursor:pointer; }
     #monitor-doble { flex:1 1 auto; display:flex; width:100%; height:100%; overflow:hidden; }
-    #monitor-doble iframe { width:50%; height:100%; border:0; display:block; background:#111; }
+    #monitor-doble iframe { width:50%; height:100%; border:0; display:block; background:#111; opacity:0; transition:opacity .25s ease; }
+    #monitor-doble iframe.cargado { opacity:1; }
+
+    /* Mini HUD estado */
+    #statusBox {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.75);
+      color: #0f0;
+      padding: 4px 6px;
+      border-radius: 5px;
+      font: 10px/1.2 monospace;
+      max-width: 200px;
+      z-index: 99999;
+      opacity: 0.85;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -66,6 +83,13 @@
       <button onclick="buscarYT()">🔍 Buscar</button>
       <button onclick="toggleRotacion()">⏸️ Pausar</button>
       <button onclick="siguienteVideo()">⏭️ Siguiente</button>
+    </div>
+
+    <!-- 🔥 NUEVO: Disparador de Doble Fullscreen -->
+    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:.6rem;">
+      <input id="dualUrl1" type="url" placeholder="https://sitio-izquierdo.com" style="flex:1; min-width:220px; padding:.5rem;">
+      <input id="dualUrl2" type="url" placeholder="https://sitio-derecho.com" style="flex:1; min-width:220px; padding:.5rem;">
+      <button onclick="abrirDesdeInputsDoble()">⛶ Doble Fullscreen</button>
     </div>
 
     <input type="text" id="buscador" placeholder="Buscar canal..." />
@@ -210,7 +234,7 @@
     </div>
   </div>
 
-  <!-- ====== OVERLAY: MONITOR DOBLE (no interfiere con lo existente) ====== -->
+  <!-- ====== OVERLAY: MONITOR DOBLE ====== -->
   <div id="wrapper-doble">
     <div id="controles-doble">
       <button onclick="salirPantallaCompletaSimulada('wrapper-doble')">✖ Salir</button>
@@ -221,31 +245,17 @@
       <iframe id="site2" title="Sitio 2"></iframe>
     </div>
   </div>
-  <!-- ============================================ -->
+  <!-- ===================================== -->
+
+  <!-- HUD estado -->
+  <div id="statusBox">M3U Loader: …</div>
 
   <!-- Librería HLS -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
   <script>
-    /* ================== HUD de estado (mini, esquina sup. derecha) ================== */
-    const statusBox = document.createElement('div');
-    statusBox.style.cssText = `
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.75);
-      color: #0f0;
-      padding: 4px 6px;
-      border-radius: 5px;
-      font: 10px/1.2 monospace;
-      max-width: 200px;
-      z-index: 99999;
-      opacity: 0.85;
-      pointer-events: none;
-    `;
-    statusBox.innerHTML = 'M3U Loader: …';
-    document.addEventListener('DOMContentLoaded', () => document.body.appendChild(statusBox));
-    const log = (...a) => { console.log('[M3U]', ...a); statusBox.innerHTML = (statusBox.innerHTML + '<br>' + a.map(String).join(' ')).slice(-2000); };
+    /* ================== HUD de estado ================== */
+    const log = (...a) => { console.log('[M3U]', ...a); const box = document.getElementById('statusBox'); box.innerHTML = (box.innerHTML + '<br>' + a.map(String).join(' ')).slice(-2000); };
 
     /* ================== Carrusel ================== */
     function scrollCarrusel(direccion) {
@@ -393,11 +403,7 @@
     async function cargarCanalesInternos() { await loadM3UFiles(true); }
 
     /* ================== Auto-load de M3U ================== */
-    const M3U_FILES = [
-      'update2.m3u',
-      'update.m3u',
-      'Country Brazil.m3u',
-    ];
+    const M3U_FILES = ['update2.m3u','update.m3u','Country Brazil.m3u'];
 
     async function fetchTextSafe(path) {
       const url = encodeURI(path.trim());
@@ -414,7 +420,7 @@
     }
 
     async function loadM3UFiles(fromButton=false) {
-      statusBox.innerHTML = fromButton ? 'Cargando listas (botón)…' : 'Auto-cargando listas…';
+      document.getElementById('statusBox').innerHTML = fromButton ? 'Cargando listas (botón)…' : 'Auto-cargando listas…';
       const results = await Promise.all(M3U_FILES.map(fetchTextSafe));
 
       const canales = [];
@@ -435,10 +441,10 @@
           { nombre:'DEMO Canal HLS 1', url:'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
           { nombre:'DEMO Big Buck Bunny', url:'https://test-streams.mux.dev/bbb-abr/bbb.m3u8' },
         ], true);
-        statusBox.innerHTML += '<br>⚠️ No se pudieron cargar tus .m3u. Revisa nombres/rutas y CORS.';
+        document.getElementById('statusBox').innerHTML += '<br>⚠️ No se pudieron cargar tus .m3u. Revisa nombres/rutas y CORS.';
       } else {
         mostrarCanales(canales, true);
-        statusBox.innerHTML += `<br>✅ Cargados ${canales.length} canales (${errores} errores)`;
+        document.getElementById('statusBox').innerHTML += `<br>✅ Cargados ${canales.length} canales (${errores} errores)`;
       }
     }
 
@@ -573,7 +579,7 @@
       } else { if (botonSalir) botonSalir.remove(); }
     }
 
-    /* ====== MODO DOBLE: Funciones públicas para abrir 2 sitios en overlay ====== */
+    /* ====== MODO DOBLE: Overlay que abre 2 sitios en paralelo ====== */
     function activarPantallaCompletaSimulada(idContenedor) {
       const el = document.getElementById(idContenedor);
       el.classList.add('fullscreen-simulado');
@@ -588,23 +594,35 @@
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
     }
-    /** Abre dos sitios (url1 y url2) en el overlay a pantalla completa simulada */
+    /** Abre dos sitios (url1 y url2) y marca 'cargado' al terminar cada uno */
     function abrirDosSitios(url1, url2) {
       const f1 = document.getElementById('site1');
       const f2 = document.getElementById('site2');
+      // limpiar estado visual
+      f1.classList.remove('cargado'); f2.classList.remove('cargado');
+      // listeners de carga para mostrar ambos con fade-in
+      f1.addEventListener('load', () => f1.classList.add('cargado'), { once: true });
+      f2.addEventListener('load', () => f2.classList.add('cargado'), { once: true });
+      // asignar URLs
       f1.src = (url1 || '').trim();
       f2.src = (url2 || '').trim();
       activarPantallaCompletaSimulada('wrapper-doble');
     }
-    // Esc para cerrar el modo doble (comodidad)
+    function abrirDesdeInputsDoble() {
+      const u1 = document.getElementById('dualUrl1').value.trim();
+      const u2 = document.getElementById('dualUrl2').value.trim();
+      if (!u1 || !u2) return alert('Escribe ambas URLs.');
+      abrirDosSitios(u1, u2);
+    }
+    // ESC para cerrar
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') salirPantallaCompletaSimulada('wrapper-doble'); });
 
     /* ================== INIT ================== */
     document.addEventListener("DOMContentLoaded", () => {
-      [0,1,2,3].forEach(initSitePicker);   // TradingView pickers
-      loadM3UFiles(false);                 // Auto-load M3U al inicio
+      [0,1,2,3].forEach(initSitePicker);
+      loadM3UFiles(false);
 
-      // Botones Fullscreen para cada monitor (se agregan a su panel de gráficos)
+      // Botones Fullscreen por monitor
       for (let i = 0; i < 4; i++) {
         const paneles = document.querySelectorAll(".botones-panel")[i * 3 + 2];
         if (paneles) {
@@ -617,7 +635,7 @@
       }
     });
 
-    /* ================== Placeholders de favoritos (tu lógica original) ================== */
+    /* ================== Placeholders de favoritos ================== */
     function agregarAFavoritos(idx){ alert('Favoritos: implementar según tu estructura de datos.'); }
     function iniciarAleatorio(idx){ alert('Aleatorio: implementar según tu lógica.'); }
     function detenerAleatorio(idx){ alert('Detener aleatorio: implementar.'); }
