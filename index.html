@@ -37,6 +37,14 @@
     .grid-split { display:grid; gap:8px; width:100%; height:100%; }
     .site-select { max-width: 420px; width: 100%; }
     .site-controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+    /* ====== MODO DOBLE (2 websites en pantalla completa simulada) ====== */
+    #wrapper-doble { display:none; position:fixed; inset:0; z-index: 10050; background:#000; flex-direction:column; }
+    #wrapper-doble.fullscreen-simulado { display:flex; }
+    #controles-doble { position: fixed; top: 10px; left: 10px; display: flex; gap: 8px; z-index: 10060; }
+    #controles-doble button { padding:6px 10px; border:none; border-radius:6px; background:#00ffd5; color:#000; font-weight:700; cursor:pointer; }
+    #monitor-doble { flex:1 1 auto; display:flex; width:100%; height:100%; overflow:hidden; }
+    #monitor-doble iframe { width:50%; height:100%; border:0; display:block; background:#111; }
   </style>
 </head>
 <body>
@@ -202,39 +210,42 @@
     </div>
   </div>
 
+  <!-- ====== OVERLAY: MONITOR DOBLE (no interfiere con lo existente) ====== -->
+  <div id="wrapper-doble">
+    <div id="controles-doble">
+      <button onclick="salirPantallaCompletaSimulada('wrapper-doble')">✖ Salir</button>
+      <button onclick="activarPantallaCompletaSimulada('wrapper-doble')">⛶ Re-entrar</button>
+    </div>
+    <div id="monitor-doble">
+      <iframe id="site1" title="Sitio 1"></iframe>
+      <iframe id="site2" title="Sitio 2"></iframe>
+    </div>
+  </div>
+  <!-- ============================================ -->
+
   <!-- Librería HLS -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <!-- Evito conflictos: si tenías un main.js que tocaba lo mismo, mejor desactivarlo
-  <script src="main.js"></script>
-  -->
 
   <script>
-    /* ================== HUD de estado ================== */
- 
-  const statusBox = document.createElement('div');
-  statusBox.style.cssText = `
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: rgba(0,0,0,0.75);
-    color: #0f0;
-    padding: 4px 6px;
-    border-radius: 5px;
-    font: 10px/1.2 monospace;
-    max-width: 200px;
-    z-index: 99999;
-    opacity: 0.85;
-    pointer-events: none;
-  `;
-  statusBox.innerHTML = 'M3U Loader: …';
-  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(statusBox));
-
-  const log = (...a) => {
-    console.log('[M3U]', ...a);
-    statusBox.innerHTML = (statusBox.innerHTML + '<br>' + a.map(String).join(' ')).slice(-2000);
-  };
-
-
+    /* ================== HUD de estado (mini, esquina sup. derecha) ================== */
+    const statusBox = document.createElement('div');
+    statusBox.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.75);
+      color: #0f0;
+      padding: 4px 6px;
+      border-radius: 5px;
+      font: 10px/1.2 monospace;
+      max-width: 200px;
+      z-index: 99999;
+      opacity: 0.85;
+      pointer-events: none;
+    `;
+    statusBox.innerHTML = 'M3U Loader: …';
+    document.addEventListener('DOMContentLoaded', () => document.body.appendChild(statusBox));
+    const log = (...a) => { console.log('[M3U]', ...a); statusBox.innerHTML = (statusBox.innerHTML + '<br>' + a.map(String).join(' ')).slice(-2000); };
 
     /* ================== Carrusel ================== */
     function scrollCarrusel(direccion) {
@@ -383,7 +394,6 @@
 
     /* ================== Auto-load de M3U ================== */
     const M3U_FILES = [
-      // 🔧 CAMBIA AQUÍ si tus archivos tienen otros nombres o carpetas
       'update2.m3u',
       'update.m3u',
       'Country Brazil.m3u',
@@ -562,6 +572,32 @@
         }
       } else { if (botonSalir) botonSalir.remove(); }
     }
+
+    /* ====== MODO DOBLE: Funciones públicas para abrir 2 sitios en overlay ====== */
+    function activarPantallaCompletaSimulada(idContenedor) {
+      const el = document.getElementById(idContenedor);
+      el.classList.add('fullscreen-simulado');
+      el.style.display = 'flex';
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    }
+    function salirPantallaCompletaSimulada(idContenedor) {
+      const el = document.getElementById(idContenedor);
+      el.classList.remove('fullscreen-simulado');
+      el.style.display = 'none';
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    }
+    /** Abre dos sitios (url1 y url2) en el overlay a pantalla completa simulada */
+    function abrirDosSitios(url1, url2) {
+      const f1 = document.getElementById('site1');
+      const f2 = document.getElementById('site2');
+      f1.src = (url1 || '').trim();
+      f2.src = (url2 || '').trim();
+      activarPantallaCompletaSimulada('wrapper-doble');
+    }
+    // Esc para cerrar el modo doble (comodidad)
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') salirPantallaCompletaSimulada('wrapper-doble'); });
 
     /* ================== INIT ================== */
     document.addEventListener("DOMContentLoaded", () => {
