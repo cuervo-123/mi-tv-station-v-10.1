@@ -1,45 +1,23 @@
- Mi TV Station - Plataforma de Reproducción Multicanal Integrada
-
-Mi TV Station es una plataforma web avanzada que permite a los usuarios ver miles de canales IPTV y contenidos de YouTube desde una interfaz moderna, fluida y personalizable.
-
-Nuevas funciones destacadas:
-
-- Cargador  de listas M3U 
-  El sistema  permite cargar  archivo de canales .m3u
-- Buscador de canales en tiempo real
-  Encuentra rápidamente tu canal favorito escribiendo su nombre o parte del mismo.
-
-- Selector de pantalla elegante (4 pantallas)
-  Al tocar cualquier canal del listado, aparece un modal visual donde puedes elegir en qué reproductor (1 a 4) quieres verlo.
-
-- Sistema de favoritos personalizable
-  Guarda tus canales preferidos con un solo clic y accede a ellos desde el panel dedicado.
-
-- Reproducción aleatoria y control temporal
-  Activa la función aleatoria para que un canal empiece desde un punto al azar o deténla cuando lo desees.
-
-- Carga externa de archivos .m3u 
-  También puedes subir tus propias listas personalizadas desde tu dispositivo Android, PC o navegador compatible.
-
-- 
-- Estilo oscuro elegante y diseño adaptativo
-  Perfecto para Smart TVs, tablets o móviles, con una interfaz limpia, moderna y cómoda para la vista.
-
-Ideal para:
-- Reproducir contenido IPTV desde varias fuentes.
-- Visualizar múltiples canales en simultáneo (hasta 4).
-- Centralizar listas de reproducción privadas y públicas.
-- Uso doméstico, en presentaciones o para coleccionistas de canales online.
-"""
-
-
-</head>
-<body>
-  <h1>🛰️ Mi TV Station - Plataforma de Reproducción Multicanal Integrada</h1>
-  <p>Mi TV Station es una plataforma web avanzada que permite a los usuarios <strong>ver miles de canales IPTV y contenidos de YouTube</strong> desde una interfaz moderna, fluida y personalizable.</p>
-
-  <h2>🔧 Nuevas funciones destacadas:</h2>
-  <ul>
+🌐 English Intro
+Welcome to THE APPTV CENTRAL — the all-in-one IPTV & streaming web app designed for maximum versatility.
+Enjoy up to 4 simultaneous monitors with full control:
+📺 Play IPTV channels (M3U & JSON playlists) with auto-loading and smooth navigation.
+🔍 Search in real time across channels and YouTube, with autoplay and rotation options.
+⭐ Save and manage your favorites, then export them easily in .m3u or .json.
+🎲 Random play mode, channel previews, and adult content unlock with secure access.
+📊 Seamless TradingView integration per monitor, open multiple sites in split-view or tabs, and even toggle fullscreen charts.
+🎛️ Modern dark interface, side menus, carousels with manual arrows, and optimized experience across devices.
+👉 Everything you need — IPTV, YouTube, TradingView, and multi-screen power — in one central hub.
+🇪🇸 Introducción en Español
+Bienvenido a THE APPTV CENTRAL — la aplicación web todo-en-uno de IPTV y streaming creada para máxima versatilidad.
+Disfruta de hasta 4 monitores simultáneos con control total:
+📺 Reproduce canales IPTV (listas M3U y JSON) con carga automática y navegación fluida.
+🔍 Búsqueda en tiempo real en canales y YouTube, con opciones de autoplay y rotación.
+⭐ Guarda y gestiona tus favoritos, y expórtalos fácilmente en .m3u o .json.
+🎲 Reproducción aleatoria, previsualización de canales y desbloqueo seguro de contenido adulto.
+📊 Integración de TradingView por monitor, abre múltiples sitios en vista dividida o pestañas, y activa gráficos en fullscreen.
+🎛️ Interfaz oscura moderna, menús laterales, carrusel con flechas manuales y experiencia optimizada en cualquier dispositivo.
+👉 Todo lo que necesitas — IPTV, YouTube, TradingView y multi-pantalla — en un solo centro centralizado.
     
     <li><strong>🔍 Buscador de canales en tiempo real:</strong> encuentra canales rápidamente escribiendo su nombre.</li>
     <li><strong>📺 Selector de pantalla elegante (4 pantallas):</strong> elige visualmente dónde ver cada canal.</li>
