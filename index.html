@@ -47,21 +47,13 @@
     #monitor-doble iframe { width:50%; height:100%; border:0; display:block; background:#111; opacity:0; transition:opacity .25s ease; }
     #monitor-doble iframe.cargado { opacity:1; }
 
-    /* Mini HUD estado */
-    #statusBox {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0, 0, 0, 0);
-      color: rgb(142, 158, 142);
-      padding: 4px 6px;
-      border-radius: 5px;
-      font: 10px/1.2 monospace;
-      max-width: 200px;
-      z-index: 99999;
-      opacity: 0.85;
-      pointer-events: none;
-    }
+    /* ====== STATUS DROPDOWN (reemplaza HUD fijo) ====== */
+    .status-wrap { position: fixed; top: 10px; right: 10px; z-index: 100000; }
+    #statusToggle { background:#ffffff; color:#000; border:1px solid #000; border-radius:8px; padding:6px 10px; font: 12px/1 system-ui, sans-serif; cursor:pointer; }
+    #statusPanel { display:none; position:absolute; top:38px; right:0; width: 360px; max-height: 50vh; overflow:auto; background:#0b0e14; color:#d5d7db; border:1px solid #273043; border-radius:10px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    .status-head { display:flex; align-items:center; gap:8px; padding:8px; border-bottom:1px solid #273043; position: sticky; top:0; background: inherit; }
+    .status-head .spacer { flex:1; }
+    #statusLog { margin:0; padding:8px; white-space: pre-wrap; word-break: break-word; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; }
   </style>
 </head>
 <body>
@@ -247,15 +239,56 @@
   </div>
   <!-- ===================================== -->
 
-  <!-- HUD estado -->
-  <div id="statusBox">M3U Loader: …</div>
+  <!-- STATUS DROPDOWN (nuevo) -->
+  <div class="status-wrap" id="statusWrap">
+    <button id="statusToggle" aria-expanded="false">🛈 Estado</button>
+    <div id="statusPanel" role="region" aria-label="Estado / Log">
+      <div class="status-head">
+        <strong>Estado / Log</strong>
+        <div class="spacer"></div>
+        <label style="font:12px/1 sans-serif;display:flex;align-items:center;gap:6px;color:#9db2c6;">
+          <input type="checkbox" id="statusAutoscroll" checked> Auto scroll
+        </label>
+        <button id="statusClear" style="background:#253043;border:1px solid #3b4a61;border-radius:6px;padding:4px 8px;color:#cfd8e3;cursor:pointer;">Limpiar</button>
+      </div>
+      <pre id="statusLog">(vacío)</pre>
+    </div>
+  </div>
 
   <!-- Librería HLS -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
   <script>
-    /* ================== HUD de estado ================== */
-    const log = (...a) => { console.log('[M3U]', ...a); const box = document.getElementById('statusBox'); box.innerHTML = (box.innerHTML + '<br>' + a.map(String).join(' ')).slice(-2000); };
+    /* ================== STATUS: dropdown + logger ================== */
+    const statusToggle = document.getElementById('statusToggle');
+    const statusPanel  = document.getElementById('statusPanel');
+    const statusLogEl  = document.getElementById('statusLog');
+    const statusClear  = document.getElementById('statusClear');
+    const statusAuto   = document.getElementById('statusAutoscroll');
+    let _logBuf = [];
+
+    function renderLog(){
+      statusLogEl.textContent = _logBuf.join('\n').slice(-20000); // 20k chars máx
+      if(statusAuto.checked){ statusLogEl.scrollTop = statusLogEl.scrollHeight; }
+    }
+    function log(){
+      const msg = Array.from(arguments).map(x => (
+        (typeof x === 'object') ? JSON.stringify(x) : String(x)
+      )).join(' ');
+      console.log('[APP]', msg);
+      _logBuf.push(msg);
+      if(_logBuf.length > 500) _logBuf = _logBuf.slice(-500);
+      renderLog();
+    }
+    function setStatus(msg){ log(msg); }
+
+    statusToggle.addEventListener('click', ()=>{
+      const open = statusPanel.style.display === 'block';
+      statusPanel.style.display = open ? 'none' : 'block';
+      statusToggle.setAttribute('aria-expanded', String(!open));
+    });
+    statusClear.addEventListener('click', ()=>{ _logBuf = []; renderLog(); });
+    document.addEventListener('keydown', (e)=>{ if(e.altKey && e.key.toLowerCase() === 'l'){ statusToggle.click(); } }); // Alt+L toggles
 
     /* ================== Carrusel ================== */
     function scrollCarrusel(direccion) {
@@ -420,7 +453,7 @@
     }
 
     async function loadM3UFiles(fromButton=false) {
-      document.getElementById('statusBox').innerHTML = fromButton ? 'Cargando listas (botón)…' : 'Auto-cargando listas…';
+      setStatus(fromButton ? 'Cargando listas (botón)…' : 'Auto-cargando listas…');
       const results = await Promise.all(M3U_FILES.map(fetchTextSafe));
 
       const canales = [];
@@ -441,10 +474,10 @@
           { nombre:'DEMO Canal HLS 1', url:'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
           { nombre:'DEMO Big Buck Bunny', url:'https://test-streams.mux.dev/bbb-abr/bbb.m3u8' },
         ], true);
-        document.getElementById('statusBox').innerHTML += '<br>⚠️ No se pudieron cargar tus .m3u. Revisa nombres/rutas y CORS.';
+        setStatus('⚠️ No se pudieron cargar tus .m3u. Revisa nombres/rutas y CORS.');
       } else {
         mostrarCanales(canales, true);
-        document.getElementById('statusBox').innerHTML += `<br>✅ Cargados ${canales.length} canales (${errores} errores)`;
+        setStatus(`✅ Cargados ${canales.length} canales (${errores} errores)`);
       }
     }
 
