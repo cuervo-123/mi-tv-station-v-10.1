@@ -3,64 +3,233 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>THE APPTV CENTRAL</title>
+  <title>THE APPTV CENTRAL — Tech Blue + Link Box Pro</title>
   <style>
-    body { background-color: #868980; color: #3a4e6e; font-family: sans-serif; margin: 0; padding: 0; }
+    :root{
+      --bg:#050a12;
+      --bg-soft:#0b1224;
+      --card:#0f1b33;
+      --accent:#1f8bff;
+      --accent-2:#4ac3ff;
+      --text:#eaf4ff;
+      --text-dim:#93a4c4;
+      --border:#1b2b4a;
+      --radius:12px;
+      --shadow:0 0 15px rgba(31,139,255,.25);
+      --ok:#21d07a;
+      --warn:#f6b73c;
+      --danger:#ff6b6b;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body {
+      margin:0; padding:0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 20% -20%, #0b172e 0%, #050a12 40%, #040814 100%);
+    }
     header, main, footer { padding: 1rem; }
-    #buscador { width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: none; border-radius: 5px; }
-    #canales-inferiores { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 0.5rem; padding: 1rem; background: #1e1f33; scroll-behavior: smooth; }
-    .canal { background: #80f077; border-radius: 10px; padding: 0.5rem 1rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-    .canal:hover { background: #d4d4ea; }
-    .player-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-    .player-container { position: relative; width: 100%; height: 30vh; background: #868980; }
-    video, .player-container iframe { width: 100%; height: 100%; object-fit: cover; }
-    .botones-panel { margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-    button { padding: 0.3rem 0.6rem; background:#5892bd; border: none; border-radius: 5px; color: white; cursor: pointer; }
-    button:hover { background: #5892bd; }
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: #ac2c2c; padding: 1rem; border-radius: 10px; width: 80%; max-height: 80%; overflow: auto; }
-    #listaFavoritos { list-style: none; padding: 0; }
-    #listaFavoritos li { padding: 0.5rem; border-bottom: 1px solid #eeeeee; display: flex; justify-content: space-between; align-items: center; }
-    .paginacion { display: flex; justify-content: center; gap: 1rem; padding: 1rem; }
-    .modal h3 { color: black; text-align: center; }
-    .modal-content button { background: #d6d7dc; border: none; color: black; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
-    .modal-content button:hover { background: #8fce00; }
-    .flecha-carrusel { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2rem; color: white; background: rgba(0, 0, 0, 0.5); border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; z-index: 10; }
+    header{
+      background: linear-gradient(180deg, #0d162b 0%, #0a1022 100%);
+      border-bottom:1px solid var(--border);
+      border-radius:0 0 var(--radius) var(--radius);
+      box-shadow: var(--shadow);
+    }
+    h1{ margin:0 0 .75rem; color: var(--accent-2); letter-spacing:.3px; text-shadow: 0 0 10px rgba(74,195,255,.45); }
+
+    /* Inputs */
+    #buscador,
+    #youtube-controls input,
+    #dualUrl1, #dualUrl2,
+    #cargarArchivo{
+      width:100%;
+      padding:.55rem .7rem;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#0d182f;
+      color:var(--text);
+      outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    #buscador:focus,
+    #youtube-controls input:focus,
+    #dualUrl1:focus, #dualUrl2:focus{
+      border-color: var(--accent-2);
+      box-shadow: 0 0 10px rgba(74,195,255,.25) inset;
+    }
+
+    /* Carrusel */
+    #carrusel-wrapper { position: relative; }
+    #canales-inferiores {
+      display:flex; flex-wrap:nowrap; overflow-x:auto; gap:.5rem;
+      padding:1rem; background: var(--card); scroll-behavior:smooth;
+      border:1px solid var(--border); border-radius: var(--radius);
+      box-shadow: inset 0 0 10px rgba(31,139,255,.12);
+    }
+    .canal{
+      background: var(--accent); color:#fff;
+      border-radius: 10px; padding: .5rem 1rem;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+      user-select:none;
+    }
+    .canal:hover{ background: var(--accent-2); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(74,195,255,.35); }
+    .flecha-carrusel {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      font-size: 1.4rem; color: #fff;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--accent);
+      border-radius: 50%; width: 46px; height: 46px;
+      cursor: pointer; z-index: 10; display:grid; place-items:center;
+      transition: all .25s ease;
+    }
+    .flecha-carrusel:hover{ background: var(--accent); box-shadow: 0 0 10px rgba(74,195,255,.45); }
     .flecha-izquierda { left: 5px; }
     .flecha-derecha { right: 5px; }
-    #carrusel-wrapper { position: relative; }
-    .fullscreen-iframe { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 9999 !important; background: black !important; }
-    .fullscreen-iframe-button { position: fixed; top: 10px; right: 10px; z-index: 10000; background: #fff; color: #000; border: 2px solid #000; border-radius: 5px; padding: 5px 10px; cursor: pointer; }
-    .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
-    .tab { padding:6px 10px; border:1px solid #444; border-radius:6px; cursor:pointer; background:#2b2b2b; color:#fff; }
-    .tab.active { background:#333; }
-    .grid-split { display:grid; gap:8px; width:100%; height:100%; }
-    .site-select { max-width: 420px; width: 100%; }
-    .site-controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
 
-    /* ====== MODO DOBLE (2 websites en pantalla completa simulada) ====== */
+    /* Rejilla de monitores */
+    .player-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem; margin-bottom: 1rem;
+    }
+    .player-container {
+      position: relative; width: 100%; height: 30vh;
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+    }
+    video, .player-container iframe { width: 100%; height: 100%; object-fit: cover; border:0; }
+
+    /* Botones / controles */
+    .botones-panel { margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    button {
+      padding: 0.45rem .8rem;
+      background: var(--accent);
+      border: none; border-radius: 10px;
+      color: #fff; cursor: pointer; font-weight: 600; letter-spacing:.2px;
+      transition: transform .15s ease, box-shadow .25s ease, background .2s ease;
+    }
+    button:hover { background: var(--accent-2); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(74,195,255,.35); }
+
+    /* Link Box (tarjetas de sitios) */
+    .linkbox{
+      margin-top:.5rem;
+      background:#0c1730;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:.6rem;
+      box-shadow: inset 0 0 10px rgba(31,139,255,.12);
+    }
+    .linkbox-head{
+      display:flex; gap:.5rem; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      margin:.2rem .2rem .6rem;
+    }
+    .linkbox-title{ color:var(--text-dim); font-size:.9rem; display:flex; align-items:center; gap:.5rem; }
+    .linkbox-tools{ display:flex; gap:.4rem; flex-wrap:wrap; }
+    .lb-filter{
+      padding:.4rem .6rem; border-radius:8px; border:1px solid var(--border); background:#0d182f; color:var(--text);
+      min-width:220px;
+    }
+
+    .linkbox-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap:.6rem;
+    }
+    .site-card{
+      display:flex; gap:.6rem; align-items:center;
+      background: linear-gradient(180deg, #0f1b33 0%, #0b1530 100%);
+      border:1px solid var(--border);
+      border-radius:12px; padding:.6rem;
+      cursor:pointer; user-select:none;
+      transition:border-color .2s ease, box-shadow .2s ease, transform .12s ease;
+      min-height:64px;
+    }
+    .site-card:hover{ border-color: var(--accent-2); box-shadow: 0 6px 18px rgba(74,195,255,.25); transform: translateY(-1px); }
+    .site-card.selected{
+      border-color: var(--ok);
+      box-shadow: 0 0 0 2px rgba(33,208,122,.35), 0 10px 24px rgba(33,208,122,.18);
+      background: linear-gradient(180deg, #0f1b33 0%, #0a1d2a 100%);
+    }
+    .site-ico{
+      width:28px; height:28px; border-radius:6px; flex:0 0 28px;
+      background:#0b1224; display:grid; place-items:center; overflow:hidden;
+      border:1px solid #1b2b4a;
+    }
+    .site-ico img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .site-meta{ display:flex; flex-direction:column; min-width:0; }
+    .site-name{ font-size:.95rem; color:#eaf4ff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .site-host{ font-size:.78rem; color:#8fb0da; opacity:.9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    /* Pestañas y layout dividido */
+    .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
+    .tab {
+      padding:6px 10px; border:1px solid var(--border); border-radius:8px; cursor:pointer;
+      background:#101d3b; color:#fff; transition:all .2s;
+    }
+    .tab.active, .tab:hover { background: var(--accent); color:#fff; box-shadow: 0 0 10px rgba(74,195,255,.35); }
+    .grid-split { display:grid; gap:8px; width:100%; height:100%; }
+
+    /* Modales */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,10,30,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content {
+      background: var(--card); color: var(--text);
+      padding: 1rem; border-radius: 12px; width: 80%; max-height: 80%;
+      overflow: auto; border:1px solid var(--border); box-shadow: 0 0 25px rgba(31,139,255,.3);
+    }
+    .modal h3 { color: var(--accent-2); text-align: center; margin-top:0; text-shadow: 0 0 10px rgba(74,195,255,.35); }
+    .modal-content button { background: var(--accent); color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; }
+    .modal-content button:hover { background: var(--accent-2); }
+
+    #listaFavoritos { list-style: none; padding: 0; margin:0; }
+    #listaFavoritos li { padding: 0.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; color:var(--text); }
+    .paginacion { display: flex; justify-content: center; gap: 1rem; padding: 1rem; }
+
+    /* Fullscreen iframe */
+    .fullscreen-iframe { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 9999 !important; background: #000 !important; }
+    .fullscreen-iframe-button {
+      position: fixed; top: 10px; right: 10px; z-index: 10000;
+      background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 6px 10px; cursor: pointer;
+      box-shadow: 0 0 12px rgba(74,195,255,.45);
+    }
+
+    /* Doble pantalla */
     #wrapper-doble { display:none; position:fixed; inset:0; z-index: 10050; background:#000; flex-direction:column; }
     #wrapper-doble.fullscreen-simulado { display:flex; }
     #controles-doble { position: fixed; top: 10px; left: 10px; display: flex; gap: 8px; z-index: 10060; }
-    #controles-doble button { padding:6px 10px; border:none; border-radius:6px; background:#00ffd5; color:#000; font-weight:700; cursor:pointer; }
+    #controles-doble button { padding:6px 10px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-weight:700; cursor:pointer; }
+    #controles-doble button:hover{ background:var(--accent-2); }
     #monitor-doble { flex:1 1 auto; display:flex; width:100%; height:100%; overflow:hidden; }
     #monitor-doble iframe { width:50%; height:100%; border:0; display:block; background:#111; opacity:0; transition:opacity .25s ease; }
     #monitor-doble iframe.cargado { opacity:1; }
 
-    /* ====== STATUS DROPDOWN (reemplaza HUD fijo) ====== */
+    /* Status dropdown */
     .status-wrap { position: fixed; top: 10px; right: 10px; z-index: 100000; }
-    #statusToggle { background:#ffffff; color:#000; border:1px solid #000; border-radius:8px; padding:6px 10px; font: 12px/1 system-ui, sans-serif; cursor:pointer; }
-    #statusPanel { display:none; position:absolute; top:38px; right:0; width: 360px; max-height: 50vh; overflow:auto; background:#0b0e14; color:#d5d7db; border:1px solid #273043; border-radius:10px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    #statusToggle {
+      background:#0f1b33; color:#eaf4ff; border:1px solid var(--border);
+      border-radius:10px; padding:6px 10px; font: 12px/1 system-ui, sans-serif; cursor:pointer;
+      box-shadow: 0 0 10px rgba(31,139,255,.18);
+    }
+    #statusToggle:hover{ background:#132545; }
+    #statusPanel {
+      display:none; position:absolute; top:38px; right:0; width: 360px; max-height: 50vh; overflow:auto;
+      background:#0b0e14; color:#d5d7db; border:1px solid #273043; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
     .status-head { display:flex; align-items:center; gap:8px; padding:8px; border-bottom:1px solid #273043; position: sticky; top:0; background: inherit; }
     .status-head .spacer { flex:1; }
-    #statusLog { margin:0; padding:8px; white-space: pre-wrap; word-break: break-word; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    #statusLog { margin:0; padding:8px; white-space: pre-wrap; word-break: break-word; font: 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; color:#cfe4ff; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{height:8px;width:8px}
+    ::-webkit-scrollbar-track{background:#0c1328}
+    ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
+    ::-webkit-scrollbar-thumb:hover{background:var(--accent-2)}
   </style>
 </head>
 <body>
-  <!-- Google CSE (opcional) -->
-  <script async src="https://cse.google.com/cse.js?cx=04f5ff6986fe641ad"></script>
-  <div class="gcse-search"></div>
-
   <header>
     <h1>THE APPTV CENTRAL</h1>
 
@@ -71,16 +240,16 @@
     </div>
 
     <div id="youtube-controls" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-      <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1; padding: 0.5rem;" />
+      <input id="youtubeSearch" type="text" placeholder="Buscar en YouTube..." style="flex: 1;" />
       <button onclick="buscarYT()">🔍 Buscar</button>
       <button onclick="toggleRotacion()">⏸️ Pausar</button>
       <button onclick="siguienteVideo()">⏭️ Siguiente</button>
     </div>
 
-    <!-- 🔥 NUEVO: Disparador de Doble Fullscreen -->
+    <!-- Doble Fullscreen -->
     <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:.6rem;">
-      <input id="dualUrl1" type="url" placeholder="https://sitio-izquierdo.com" style="flex:1; min-width:220px; padding:.5rem;">
-      <input id="dualUrl2" type="url" placeholder="https://sitio-derecho.com" style="flex:1; min-width:220px; padding:.5rem;">
+      <input id="dualUrl1" type="url" placeholder="https://sitio-izquierdo.com" style="flex:1; min-width:220px;">
+      <input id="dualUrl2" type="url" placeholder="https://sitio-derecho.com" style="flex:1; min-width:220px;">
       <button onclick="abrirDesdeInputsDoble()">⛶ Doble Fullscreen</button>
     </div>
 
@@ -97,6 +266,20 @@
       <!-- MONITOR 1 -->
       <div>
         <div class="player-container" data-index="0"><video id="player1" controls></video></div>
+
+        <!-- 🔷 LINK BOX (Monitor 1) -->
+        <div class="linkbox" data-lb="0">
+          <div class="linkbox-head">
+            <div class="linkbox-title">🌐 Sitios favoritos · Selecciona 1..N y usa “Abrir sitios”</div>
+            <div class="linkbox-tools">
+              <input class="lb-filter" id="lbFilter0" type="search" placeholder="Filtrar sitios...">
+              <button onclick="lbSelectAll(0)">✔ Seleccionar todo</button>
+              <button onclick="lbClearAll(0)">✖ Quitar todo</button>
+            </div>
+          </div>
+          <div class="linkbox-grid" id="linkboxGrid0"></div>
+        </div>
+
         <div class="botones-panel">
           <button onclick="agregarAFavoritos(0)">⭐ Guardar</button>
           <button onclick="iniciarAleatorio(0)">🎲 Aleatorio</button>
@@ -104,7 +287,8 @@
           <button onclick="reproducirDesdeBusqueda(0)">▶️ YouTube</button>
         </div>
         <div class="botones-panel">
-          <select id="siteSelect0" multiple size="5" class="site-select"></select>
+          <!-- select oculto (compatibilidad) -->
+          <select id="siteSelect0" multiple size="5" class="site-select" style="display:none;"></select>
           <div class="site-controls">
             <label style="display:flex;align-items:center;gap:6px;">
               <input type="checkbox" id="splitMode0" checked> Vista dividida (si hay varios)
@@ -115,7 +299,7 @@
           </div>
         </div>
         <div class="botones-panel">
-          <input type="text" id="symbolInput0" placeholder="Símbolo (ej: EURUSD)" style="flex: 1; padding: 0.5rem;" />
+          <input type="text" id="symbolInput0" placeholder="Símbolo (ej: EURUSD)" style="flex: 1;" />
           <button onclick="cargarGraficoTV(0)">📈 Gráfico</button>
           <button onclick="quitarGraficoTV(0)">🗑️ Quitar</button>
         </div>
@@ -124,6 +308,20 @@
       <!-- MONITOR 2 -->
       <div>
         <div class="player-container" data-index="1"><video id="player2" controls></video></div>
+
+        <!-- 🔷 LINK BOX (Monitor 2) -->
+        <div class="linkbox" data-lb="1">
+          <div class="linkbox-head">
+            <div class="linkbox-title">🌐 Sitios favoritos</div>
+            <div class="linkbox-tools">
+              <input class="lb-filter" id="lbFilter1" type="search" placeholder="Filtrar sitios...">
+              <button onclick="lbSelectAll(1)">✔ Seleccionar todo</button>
+              <button onclick="lbClearAll(1)">✖ Quitar todo</button>
+            </div>
+          </div>
+          <div class="linkbox-grid" id="linkboxGrid1"></div>
+        </div>
+
         <div class="botones-panel">
           <button onclick="agregarAFavoritos(1)">⭐ Guardar</button>
           <button onclick="iniciarAleatorio(1)">🎲 Aleatorio</button>
@@ -131,7 +329,7 @@
           <button onclick="reproducirDesdeBusqueda(1)">▶️ YouTube</button>
         </div>
         <div class="botones-panel">
-          <select id="siteSelect1" multiple size="5" class="site-select"></select>
+          <select id="siteSelect1" multiple size="5" class="site-select" style="display:none;"></select>
           <div class="site-controls">
             <label style="display:flex;align-items:center;gap:6px;">
               <input type="checkbox" id="splitMode1" checked> Vista dividida (si hay varios)
@@ -142,7 +340,7 @@
           </div>
         </div>
         <div class="botones-panel">
-          <input type="text" id="symbolInput1" placeholder="Símbolo (ej: EURUSD)" style="flex: 1; padding: 0.5rem;" />
+          <input type="text" id="symbolInput1" placeholder="Símbolo (ej: EURUSD)" style="flex: 1;" />
           <button onclick="cargarGraficoTV(1)">📈 Gráfico</button>
           <button onclick="quitarGraficoTV(1)">🗑️ Quitar</button>
         </div>
@@ -151,6 +349,20 @@
       <!-- MONITOR 3 -->
       <div>
         <div class="player-container" data-index="2"><video id="player3" controls></video></div>
+
+        <!-- 🔷 LINK BOX (Monitor 3) -->
+        <div class="linkbox" data-lb="2">
+          <div class="linkbox-head">
+            <div class="linkbox-title">🌐 Sitios favoritos</div>
+            <div class="linkbox-tools">
+              <input class="lb-filter" id="lbFilter2" type="search" placeholder="Filtrar sitios...">
+              <button onclick="lbSelectAll(2)">✔ Seleccionar todo</button>
+              <button onclick="lbClearAll(2)">✖ Quitar todo</button>
+            </div>
+          </div>
+          <div class="linkbox-grid" id="linkboxGrid2"></div>
+        </div>
+
         <div class="botones-panel">
           <button onclick="agregarAFavoritos(2)">⭐ Guardar</button>
           <button onclick="iniciarAleatorio(2)">🎲 Aleatorio</button>
@@ -158,7 +370,7 @@
           <button onclick="reproducirDesdeBusqueda(2)">▶️ YouTube</button>
         </div>
         <div class="botones-panel">
-          <select id="siteSelect2" multiple size="5" class="site-select"></select>
+          <select id="siteSelect2" multiple size="5" class="site-select" style="display:none;"></select>
           <div class="site-controls">
             <label style="display:flex;align-items:center;gap:6px;">
               <input type="checkbox" id="splitMode2" checked> Vista dividida (si hay varios)
@@ -169,7 +381,7 @@
           </div>
         </div>
         <div class="botones-panel">
-          <input type="text" id="symbolInput2" placeholder="Símbolo (ej: EURUSD)" style="flex: 1; padding: 0.5rem;" />
+          <input type="text" id="symbolInput2" placeholder="Símbolo (ej: EURUSD)" style="flex: 1;" />
           <button onclick="cargarGraficoTV(2)">📈 Gráfico</button>
           <button onclick="quitarGraficoTV(2)">🗑️ Quitar</button>
         </div>
@@ -178,6 +390,20 @@
       <!-- MONITOR 4 -->
       <div>
         <div class="player-container" data-index="3"><video id="player4" controls></video></div>
+
+        <!-- 🔷 LINK BOX (Monitor 4) -->
+        <div class="linkbox" data-lb="3">
+          <div class="linkbox-head">
+            <div class="linkbox-title">🌐 Sitios favoritos</div>
+            <div class="linkbox-tools">
+              <input class="lb-filter" id="lbFilter3" type="search" placeholder="Filtrar sitios...">
+              <button onclick="lbSelectAll(3)">✔ Seleccionar todo</button>
+              <button onclick="lbClearAll(3)">✖ Quitar todo</button>
+            </div>
+          </div>
+          <div class="linkbox-grid" id="linkboxGrid3"></div>
+        </div>
+
         <div class="botones-panel">
           <button onclick="agregarAFavoritos(3)">⭐ Guardar</button>
           <button onclick="iniciarAleatorio(3)">🎲 Aleatorio</button>
@@ -185,7 +411,7 @@
           <button onclick="reproducirDesdeBusqueda(3)">▶️ YouTube</button>
         </div>
         <div class="botones-panel">
-          <select id="siteSelect3" multiple size="5" class="site-select"></select>
+          <select id="siteSelect3" multiple size="5" class="site-select" style="display:none;"></select>
           <div class="site-controls">
             <label style="display:flex;align-items:center;gap:6px;">
               <input type="checkbox" id="splitMode3" checked> Vista dividida (si hay varios)
@@ -196,7 +422,7 @@
           </div>
         </div>
         <div class="botones-panel">
-          <input type="text" id="symbolInput3" placeholder="Símbolo (ej: EURUSD)" style="flex: 1; padding: 0.5rem;" />
+          <input type="text" id="symbolInput3" placeholder="Símbolo (ej: EURUSD)" style="flex: 1;" />
           <button onclick="cargarGraficoTV(3)">📈 Gráfico</button>
           <button onclick="quitarGraficoTV(3)">🗑️ Quitar</button>
         </div>
@@ -209,7 +435,9 @@
     <div class="modal-content">
       <h3>🎯 Favoritos</h3>
       <ul id="listaFavoritos"></ul>
-      <button onclick="cerrarModal()">Cerrar</button>
+      <div style="text-align:right;margin-top:10px;">
+        <button onclick="cerrarModal()">Cerrar</button>
+      </div>
     </div>
   </div>
 
@@ -222,11 +450,13 @@
         <button onclick="reproducirEnPantallaSeleccionada(2)">Pantalla 3</button>
         <button onclick="reproducirEnPantallaSeleccionada(3)">Pantalla 4</button>
       </div>
-      <button onclick="cerrarModalPantalla()">Cancelar</button>
+      <div style="text-align:right;">
+        <button onclick="cerrarModalPantalla()">Cancelar</button>
+      </div>
     </div>
   </div>
 
-  <!-- ====== OVERLAY: MONITOR DOBLE ====== -->
+  <!-- OVERLAY: MONITOR DOBLE -->
   <div id="wrapper-doble">
     <div id="controles-doble">
       <button onclick="salirPantallaCompletaSimulada('wrapper-doble')">✖ Salir</button>
@@ -237,9 +467,8 @@
       <iframe id="site2" title="Sitio 2"></iframe>
     </div>
   </div>
-  <!-- ===================================== -->
 
-  <!-- STATUS DROPDOWN (nuevo) -->
+  <!-- STATUS DROPDOWN -->
   <div class="status-wrap" id="statusWrap">
     <button id="statusToggle" aria-expanded="false">🛈 Estado</button>
     <div id="statusPanel" role="region" aria-label="Estado / Log">
@@ -249,7 +478,7 @@
         <label style="font:12px/1 sans-serif;display:flex;align-items:center;gap:6px;color:#9db2c6;">
           <input type="checkbox" id="statusAutoscroll" checked> Auto scroll
         </label>
-        <button id="statusClear" style="background:#253043;border:1px solid #3b4a61;border-radius:6px;padding:4px 8px;color:#cfd8e3;cursor:pointer;">Limpiar</button>
+        <button id="statusClear" style="background:#253043;border:1px solid #3b4a61;border-radius:8px;padding:4px 8px;color:#cfd8e3;cursor:pointer;">Limpiar</button>
       </div>
       <pre id="statusLog">(vacío)</pre>
     </div>
@@ -266,38 +495,20 @@
     const statusClear  = document.getElementById('statusClear');
     const statusAuto   = document.getElementById('statusAutoscroll');
     let _logBuf = [];
-
-    function renderLog(){
-      statusLogEl.textContent = _logBuf.join('\n').slice(-20000); // 20k chars máx
-      if(statusAuto.checked){ statusLogEl.scrollTop = statusLogEl.scrollHeight; }
-    }
-    function log(){
-      const msg = Array.from(arguments).map(x => (
-        (typeof x === 'object') ? JSON.stringify(x) : String(x)
-      )).join(' ');
-      console.log('[APP]', msg);
-      _logBuf.push(msg);
-      if(_logBuf.length > 500) _logBuf = _logBuf.slice(-500);
-      renderLog();
-    }
+    function renderLog(){ statusLogEl.textContent = _logBuf.join('\n').slice(-20000); if(statusAuto.checked){ statusLogEl.scrollTop = statusLogEl.scrollHeight; } }
+    function log(){ const msg = Array.from(arguments).map(x => (typeof x === 'object') ? JSON.stringify(x) : String(x)).join(' '); console.log('[APP]', msg); _logBuf.push(msg); if(_logBuf.length>500) _logBuf = _logBuf.slice(-500); renderLog(); }
     function setStatus(msg){ log(msg); }
-
-    statusToggle.addEventListener('click', ()=>{
-      const open = statusPanel.style.display === 'block';
-      statusPanel.style.display = open ? 'none' : 'block';
-      statusToggle.setAttribute('aria-expanded', String(!open));
-    });
+    statusToggle.addEventListener('click', ()=>{ const open = statusPanel.style.display === 'block'; statusPanel.style.display = open ? 'none' : 'block'; statusToggle.setAttribute('aria-expanded', String(!open)); });
     statusClear.addEventListener('click', ()=>{ _logBuf = []; renderLog(); });
-    document.addEventListener('keydown', (e)=>{ if(e.altKey && e.key.toLowerCase() === 'l'){ statusToggle.click(); } }); // Alt+L toggles
+    document.addEventListener('keydown', (e)=>{ if(e.altKey && e.key.toLowerCase() === 'l'){ statusToggle.click(); } });
 
     /* ================== Carrusel ================== */
     function scrollCarrusel(direccion) {
       const carrusel = document.getElementById("canales-inferiores");
-      const cantidad = 300 * direccion;
-      carrusel.scrollBy({ left: cantidad, behavior: "smooth" });
+      carrusel.scrollBy({ left: 300 * direccion, behavior: "smooth" });
     }
 
-    /* ================== Parser M3U tolerante ================== */
+    /* ================== Parser M3U ================== */
     function parseM3U(text) {
       const clean = (text || '').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
       const lines = clean.split('\n');
@@ -313,10 +524,7 @@
             name = line.slice(commaIdx+1).trim() || name;
           }
           const url = (lines[i+1] || '').trim();
-          if (url && /^https?:\/\//i.test(url)) {
-            out.push({ nombre: name, url });
-            i++;
-          }
+          if (url && /^https?:\/\//i.test(url)) { out.push({ nombre: name, url }); i++; }
           continue;
         }
         if (/^https?:\/\//i.test(line)) {
@@ -326,7 +534,7 @@
       return out;
     }
 
-    /* ================== Render & estado ================== */
+    /* ================== Render & estado (Carrusel) ================== */
     let canalSeleccionado = null;
     let listaOriginalCanales = [];
 
@@ -350,7 +558,6 @@
       log('✅ Carrusel renderizado:', canales.length, 'canales');
     }
 
-    // Click delegado carrusel
     document.getElementById('canales-inferiores').addEventListener('click', (e) => {
       const item = e.target.closest('.canal');
       if (!item) return;
@@ -359,23 +566,33 @@
       mostrarModalPantalla(url);
     });
 
-    /* ================== Modal & reproducción ================== */
+    /* ================== Modal & reproducción (CORREGIDO) ================== */
     function mostrarModalPantalla(url) {
       canalSeleccionado = url;
-      document.getElementById("modalPantalla").style.display = "flex";
+      const modal = document.getElementById("modalPantalla");
+      if (modal) modal.style.display = "flex";
     }
+
     function cerrarModalPantalla() {
-      document.getElementById("modalPantalla").style.display = "none";
+      const modal = document.getElementById("modalPantalla");
+      if (modal) modal.style.display = "none";
       canalSeleccionado = null;
     }
+
     function reproducirEnPantallaSeleccionada(pantallaIndex) {
+      if (!Number.isInteger(pantallaIndex) || pantallaIndex < 0 || pantallaIndex > 3) {
+        alert("Pantalla inválida.");
+        return;
+      }
       if (canalSeleccionado) {
         const container = document.querySelector(`.player-container[data-index='${pantallaIndex}']`);
+        if (!container) { alert("Contenedor no encontrado."); return; }
         container.innerHTML = `<video id="player${pantallaIndex + 1}" controls></video>`;
         reproducirCanal(canalSeleccionado, pantallaIndex);
       }
       cerrarModalPantalla();
     }
+
     function reproducirCanal(url, playerIndex) {
       const player = document.getElementById(`player${playerIndex + 1}`);
       if (!player) return;
@@ -386,17 +603,21 @@
         hls.loadSource(url);
         hls.attachMedia(player);
         player.hlsInstance = hls;
-        hls.on(Hls.Events.MANIFEST_PARSED, () => player.play().catch(()=>{}));
-        hls.on(Hls.Events.ERROR, (e,data)=> log('HLS error', data?.type, data?.details || ''));
-      } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          if (player && player.play) player.play().catch(()=>{});
+        });
+        hls.on(Hls.Events.ERROR, (_, data)=> log('HLS error', data?.type || '', data?.details || ''));
+      } else if (player.canPlayType && player.canPlayType('application/vnd.apple.mpegurl')) {
         player.src = url;
-        player.addEventListener('loadedmetadata', () => player.play().catch(()=>{}), { once:true });
+        player.addEventListener('loadedmetadata', () => {
+          if (player && player.play) player.play().catch(()=>{});
+        }, { once:true });
       } else {
         alert("Tu navegador no soporta la reproducción de este canal.");
       }
     }
 
-    /* ================== Búsqueda ================== */
+    /* ================== Búsqueda canales (carrusel) ================== */
     function filtrarCanales() {
       const texto = (document.getElementById("buscador").value || '').toLowerCase();
       const filtrados = listaOriginalCanales.filter(c => (c.nombre||'').toLowerCase().includes(texto));
@@ -432,10 +653,8 @@
       e.target.value = '';
     });
 
-    /* ================== Carga interna (botón) ================== */
+    /* ================== Carga interna / Auto-load ================== */
     async function cargarCanalesInternos() { await loadM3UFiles(true); }
-
-    /* ================== Auto-load de M3U ================== */
     const M3U_FILES = ['update2.m3u','xumo.m3u','xiaomi.m3u','localnow.m3u','update.m3u','Country Brazil.m3u'];
 
     async function fetchTextSafe(path) {
@@ -519,9 +738,18 @@
     function toggleRotacion() { isPaused = !isPaused; alert(isPaused ? "⏸️ Rotación pausada." : "▶️ Rotación reanudada."); }
     function siguienteVideo() { currentVideoIndex = (currentVideoIndex + 1) % youtubeResults.length; reproducirVideoActual(); }
 
-    /* ================== TradingView / sitios por monitor ================== */
+    /* ================== Favoritos (stubs) ================== */
+    function agregarAFavoritos(idx){ alert('Favoritos: implementar según tu estructura de datos.'); }
+    function iniciarAleatorio(idx){ alert('Aleatorio: implementar según tu lógica.'); }
+    function detenerAleatorio(idx){ alert('Detener aleatorio: implementar.'); }
+    function reproducirDesdeBusqueda(idx){ alert('YouTube por monitor: adaptar si quieres búsquedas por monitor.'); }
+    function mostrarFavoritos(){ document.getElementById('modalFavoritos').style.display='flex'; }
+    function cerrarModal(){ document.getElementById('modalFavoritos').style.display='none'; }
+    function exportarFavoritos(){ alert('Exportar favoritos: implementar según tu formato.'); }
+    function desbloquearAdulto(){ alert('Adultos: implementar PIN/clave.'); }
+
+    /* ================== Sitios por monitor: data ================== */
     const FAVORITE_SITES = [
-      
       { label: "Karaoke Movies And Iptv Organizer pro central App", url: "https://cuervo-123.github.io/tv-station-and-karaoke-entreatment-app/" },
       { label: "Full screen Multy app central", url: "https://cuervo-123.github.io/trading-central/" },
       { label: "Playlist Creator Pro V2", url: "https://cuervo-123.github.io/cuervo-123-TV-STATION-PLAYLIST-CREATOR-1/" },
@@ -540,47 +768,131 @@
       { label: "Games", url: "https://gamesnacks.com/" },
       { label: "TV-STATION-PLAYLIST-CREATOR-PRO", url: "https://cuervo-123.github.io/TV-STATION-PLAYLIST-CREATOR-PRO/" },
       { label: "iptv-with-curvy-multtiple-monitors-effects-v1", url: "https://cuervo-123.github.io/iptv-with-curvy-multtiple-monitors-effects-v1/" },
-      { label: "Web Organizer Pro central app", url: "https://cuervo-123.github.io/reproductor-con-escudo-multy-links-2/" }, 
+      { label: "Web Organizer Pro central app", url: "https://cuervo-123.github.io/reproductor-con-escudo-multy-links-2/" },
       { label: "W3U Play List Uploader App", url: "https://cuervo-123.github.io/w3u-reader-iptv-plus/" },
       { label: "The App V1", url: "https://cuervo-123.github.io/worldtv4you/" },
       { label: "The App homepage user", url: "https://cuervo-123.github.io/Ximena-homepage/" },
       { label: "weltrade Suit App", url: "https://cuervo-123.github.io/weltrade-trading-view-central-app/" }
     ];
     const LS_KEY = (idx) => `siteSelection:${idx}`;
-    const normalizeUrl = (u) => { if (!u) return ""; let url = u.trim(); if (!/^https?:\/\//i.test(url)) url = "https://" + url.replace(/^\/+/, ""); return url; };
 
+    /* ===== Helpers favicon/host ===== */
+    function hostFromUrl(url){ try { return new URL(url).hostname; } catch { return ''; } }
+    function faviconUrl(url){ const host = hostFromUrl(url); return host ? `https://www.google.com/s2/favicons?domain=${host}&sz=64` : ''; }
+
+    /* ===== Link Box rendering / selección ===== */
+    function renderLinkBox(index){
+      const grid = document.getElementById(`linkboxGrid${index}`);
+      if(!grid) return;
+
+      const saved = JSON.parse(localStorage.getItem(LS_KEY(index)) || "[]");
+
+      grid.innerHTML = FAVORITE_SITES.map(s=>{
+        const selected = saved.includes(s.url) ? 'selected' : '';
+        const host = hostFromUrl(s.url);
+        const ico  = faviconUrl(s.url);
+        const safeUrl = s.url.replace(/"/g, '&quot;');
+        return `
+          <div class="site-card ${selected}" data-url="${safeUrl}" data-label="${s.label.toLowerCase()}" data-host="${(host||'').toLowerCase()}">
+            <div class="site-ico">${ico ? `<img src="${ico}" alt="ico">` : '🌐'}</div>
+            <div class="site-meta">
+              <div class="site-name" title="${s.label}">${s.label}</div>
+              <div class="site-host" title="${s.url}">${host || s.url}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      // Delegación de click para seleccionar
+      grid.addEventListener('click', (e)=>{
+        const card = e.target.closest('.site-card');
+        if(!card) return;
+        card.classList.toggle('selected');
+        persistSelectionFromCards(index);
+      });
+    }
+
+    function selectedUrlsFromCards(index){
+      const grid = document.getElementById(`linkboxGrid${index}`);
+      if(!grid) return [];
+      return Array.from(grid.querySelectorAll('.site-card.selected')).map(c=>c.getAttribute('data-url')).filter(Boolean);
+    }
+    function persistSelectionFromCards(index){
+      const urls = selectedUrlsFromCards(index);
+      localStorage.setItem(LS_KEY(index), JSON.stringify(urls));
+      // sincroniza select oculto (compat)
+      const select = document.getElementById(`siteSelect${index}`);
+      if(select){
+        Array.from(select.options).forEach(o => { o.selected = urls.includes(o.value); });
+      }
+    }
+
+    // Filtro por texto (por monitor)
+    function attachFilter(index){
+      const input = document.getElementById(`lbFilter${index}`);
+      const grid  = document.getElementById(`linkboxGrid${index}`);
+      if(!input || !grid) return;
+      input.addEventListener('input', ()=>{
+        const q = input.value.trim().toLowerCase();
+        grid.querySelectorAll('.site-card').forEach(card=>{
+          const byLabel = card.getAttribute('data-label') || '';
+          const byHost  = card.getAttribute('data-host') || '';
+          const visible = (!q) || byLabel.includes(q) || byHost.includes(q);
+          card.style.display = visible ? '' : 'none';
+        });
+      });
+    }
+
+    // Seleccionar / Quitar todo (por monitor)
+    function lbSelectAll(index){
+      const grid = document.getElementById(`linkboxGrid${index}`);
+      if(!grid) return;
+      grid.querySelectorAll('.site-card').forEach(c => { if(c.style.display !== 'none') c.classList.add('selected'); });
+      persistSelectionFromCards(index);
+    }
+    function lbClearAll(index){
+      const grid = document.getElementById(`linkboxGrid${index}`);
+      if(!grid) return;
+      grid.querySelectorAll('.site-card').forEach(c => c.classList.remove('selected'));
+      persistSelectionFromCards(index);
+    }
+
+    /* ===== Select oculto (compat) ===== */
     function initSitePicker(index) {
       const select = document.getElementById(`siteSelect${index}`);
-      if (!select) return;
-      select.innerHTML = FAVORITE_SITES.map(s => `<option value="${s.url}">${s.label} — ${s.url}</option>`).join("");
-      const saved = JSON.parse(localStorage.getItem(LS_KEY(index)) || "[]");
-      Array.from(select.options).forEach(opt => { if (saved.includes(opt.value)) opt.selected = true; });
+      if (select) {
+        select.innerHTML = FAVORITE_SITES.map(s => `<option value="${s.url}">${s.label} — ${s.url}</option>`).join("");
+        const saved = JSON.parse(localStorage.getItem(LS_KEY(index)) || "[]");
+        Array.from(select.options).forEach(opt => { opt.selected = saved.includes(opt.value); });
+      }
+      renderLinkBox(index);
+      attachFilter(index);
     }
-    function guardarSeleccionSitios(index) {
+
+    /* ===== Render iframes ===== */
+    const normalizeUrl = (u) => { if (!u) return ""; let url = u.trim(); if (!/^https?:\/\//i.test(url)) url = "https://" + url.replace(/^\/+/, ""); return url; };
+
+    function getSelectedSites(index){
+      const urls = selectedUrlsFromCards(index);
+      if(urls.length) return urls;
       const select = document.getElementById(`siteSelect${index}`);
-      const seleccion = Array.from(select.selectedOptions).map(o => o.value);
-      localStorage.setItem(LS_KEY(index), JSON.stringify(seleccion));
-      alert("Selección guardada ✅");
+      return select ? Array.from(select.selectedOptions).map(o => o.value) : [];
     }
-    function limpiarSeleccionSitios(index) {
-      const select = document.getElementById(`siteSelect${index}`);
-      Array.from(select.options).forEach(o => (o.selected = false));
-      localStorage.removeItem(LS_KEY(index));
-    }
+
     function renderIframesInContainer(index, urls) {
       const container = document.querySelector(`.player-container[data-index='${index}']`);
       if (!container) return;
       const cleanUrls = urls.map(normalizeUrl).filter(Boolean);
-      if (!cleanUrls.length) return alert("Selecciona al menos 1 sitio.");
+      if (!cleanUrls.length) { alert("Selecciona al menos 1 sitio."); return; }
       const split = document.getElementById(`splitMode${index}`)?.checked && cleanUrls.length > 1;
 
       if (split) {
         const n = cleanUrls.length;
         let cols = 2; if (n === 3) cols = 3; if (n >= 4) cols = 3;
         const gridStyle = `grid-template-columns: repeat(${cols}, 1fr); grid-auto-rows: minmax(200px, 1fr);`;
-        container.innerHTML = `<div class="grid-split" style="${gridStyle}; width:100%; height:100%;">${cleanUrls.map(u => `
-          <iframe src="${u}" style="width:100%; height:100%; border:0;" frameborder="0" scrolling="auto" allow="fullscreen; clipboard-read; clipboard-write"></iframe>`).join("")}
-        </div>`;
+        container.innerHTML = `
+          <div class="grid-split" style="${gridStyle}; width:100%; height:100%;">${cleanUrls.map(u => `
+            <iframe src="${u}" style="width:100%; height:100%; border:0;" frameborder="0" scrolling="auto" allow="fullscreen; clipboard-read; clipboard-write"></iframe>`).join("")}
+          </div>`;
       } else if (cleanUrls.length === 1) {
         container.innerHTML = `<iframe id="iframe-${index}-0" src="${cleanUrls[0]}" style="width:100%; height:100%; border:0;" frameborder="0" scrolling="auto" allow="fullscreen; clipboard-read; clipboard-write"></iframe>`;
       } else {
@@ -589,6 +901,7 @@
         container.innerHTML = `<div class="tabs" id="tabs-${index}">${tabs}</div><div style="width:100%; height:calc(100% - 46px);">${iframes}</div>`;
       }
     }
+
     function activarTab(index, i) {
       const tabsWrap = document.getElementById(`tabs-${index}`); if (!tabsWrap) return;
       tabsWrap.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -596,23 +909,23 @@
       const container = document.querySelector(`.player-container[data-index='${index}']`); if (!container) return;
       container.querySelectorAll("iframe[id^='iframe-']").forEach((f, idx) => { f.style.display = (idx === i) ? "block" : "none"; });
     }
+
     function cargarGraficoTV(index) {
-      const select = document.getElementById(`siteSelect${index}`);
-      const seleccion = select ? Array.from(select.selectedOptions).map(o => o.value) : [];
+      const seleccion = getSelectedSites(index);
       const urls = (seleccion.length > 0) ? seleccion : ["https://cuervo-123.github.io/GLOBALTV4YOUPLUS/"];
       renderIframesInContainer(index, urls);
     }
+
     function quitarGraficoTV(index) {
       const container = document.querySelector(`.player-container[data-index='${index}']`);
-      container.innerHTML = `<video id="player${index + 1}" controls></video>`;
+      if (container) container.innerHTML = `<video id="player${index + 1}" controls></video>`;
     }
+
     function toggleFullscreenGrafico(index) {
       const container = document.querySelector(`.player-container[data-index='${index}']`);
-      const iframe = container.querySelector('iframe');
-      if (!iframe) return alert("No hay gráfico para esta pantalla.");
+      const iframe = container ? container.querySelector('iframe') : null;
+      if (!iframe) { alert("No hay gráfico para esta pantalla."); return; }
       const isFullscreen = iframe.classList.toggle("fullscreen-iframe");
-      const boton = document.getElementById(`btnFullscreen${index}`);
-      if (boton) boton.textContent = isFullscreen ? "❌ Salir de Fullscreen" : "🔍 Fullscreen";
       let botonSalir = document.getElementById(`btnExitFullscreen${index}`);
       if (isFullscreen) {
         if (!botonSalir) {
@@ -626,9 +939,10 @@
       } else { if (botonSalir) botonSalir.remove(); }
     }
 
-    /* ====== MODO DOBLE: Overlay que abre 2 sitios en paralelo ====== */
+    /* ====== MODO DOBLE ====== */
     function activarPantallaCompletaSimulada(idContenedor) {
       const el = document.getElementById(idContenedor);
+      if (!el) return;
       el.classList.add('fullscreen-simulado');
       el.style.display = 'flex';
       document.documentElement.style.overflow = 'hidden';
@@ -636,21 +950,19 @@
     }
     function salirPantallaCompletaSimulada(idContenedor) {
       const el = document.getElementById(idContenedor);
+      if (!el) return;
       el.classList.remove('fullscreen-simulado');
       el.style.display = 'none';
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
     }
-    /** Abre dos sitios (url1 y url2) y marca 'cargado' al terminar cada uno */
     function abrirDosSitios(url1, url2) {
       const f1 = document.getElementById('site1');
       const f2 = document.getElementById('site2');
-      // limpiar estado visual
+      if (!f1 || !f2) return;
       f1.classList.remove('cargado'); f2.classList.remove('cargado');
-      // listeners de carga para mostrar ambos con fade-in
       f1.addEventListener('load', () => f1.classList.add('cargado'), { once: true });
       f2.addEventListener('load', () => f2.classList.add('cargado'), { once: true });
-      // asignar URLs
       f1.src = (url1 || '').trim();
       f2.src = (url2 || '').trim();
       activarPantallaCompletaSimulada('wrapper-doble');
@@ -658,10 +970,9 @@
     function abrirDesdeInputsDoble() {
       const u1 = document.getElementById('dualUrl1').value.trim();
       const u2 = document.getElementById('dualUrl2').value.trim();
-      if (!u1 || !u2) return alert('Escribe ambas URLs.');
+      if (!u1 || !u2) { alert('Escribe ambas URLs.'); return; }
       abrirDosSitios(u1, u2);
     }
-    // ESC para cerrar
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') salirPantallaCompletaSimulada('wrapper-doble'); });
 
     /* ================== INIT ================== */
@@ -669,10 +980,10 @@
       [0,1,2,3].forEach(initSitePicker);
       loadM3UFiles(false);
 
-      // Botones Fullscreen por monitor
+      // Botones Fullscreen por monitor (fila de botones de gráfico)
       for (let i = 0; i < 4; i++) {
         const paneles = document.querySelectorAll(".botones-panel")[i * 3 + 2];
-        if (paneles) {
+        if (paneles && !paneles.querySelector(`#btnFullscreen${i}`)) {
           const botonFull = document.createElement("button");
           botonFull.textContent = "🔍 Fullscreen";
           botonFull.id = `btnFullscreen${i}`;
@@ -681,16 +992,6 @@
         }
       }
     });
-
-    /* ================== Placeholders de favoritos ================== */
-    function agregarAFavoritos(idx){ alert('Favoritos: implementar según tu estructura de datos.'); }
-    function iniciarAleatorio(idx){ alert('Aleatorio: implementar según tu lógica.'); }
-    function detenerAleatorio(idx){ alert('Detener aleatorio: implementar.'); }
-    function reproducirDesdeBusqueda(idx){ alert('YouTube por monitor: adaptar si quieres búsquedas por monitor.'); }
-    function mostrarFavoritos(){ document.getElementById('modalFavoritos').style.display='flex'; }
-    function cerrarModal(){ document.getElementById('modalFavoritos').style.display='none'; }
-    function exportarFavoritos(){ alert('Exportar favoritos: implementar según tu formato.'); }
-    function desbloquearAdulto(){ alert('Adultos: implementar PIN/clave.'); }
   </script>
 </body>
 </html>
